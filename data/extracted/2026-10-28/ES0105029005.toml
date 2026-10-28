@@ -1,0 +1,13 @@
+isin = "ES0105029005"
+name = "FACEPHI BIOMETRIA"
+# FY2025 pack: 05029_OtraInfRelev_20260504_1.pdf (consolidated report p35, individual p139).
+# Only the opinion is entered: it decides the case (F7 FAIL), so the rest was not read.
+
+[[figure]]
+metric = "audit_opinion"
+value = "QUALIFIED"
+scale = 1
+file = "05029_OtraInfRelev_20260504_1.pdf"
+page = 35
+method = "pdftotext"
+note = "Consolidated FY2025: 'Opinion con salvedades', scope limitation on R&D financing agreements with AIEs (economic interest groupings): reality of the operations and whether they should be consolidated. Same qualification in the individual report, p139. The company's own note explaining it, p2."
