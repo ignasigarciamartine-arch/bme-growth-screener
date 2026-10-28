@@ -54,6 +54,8 @@ def harvest(cfg, as_of, cache, offline, log):
     # Snapshots taken before 2026-10-28 do not record the prior accounts.
     sources.download_filings({k: v["filing_prior"] for k, v in docs.items() if "filing_prior" in v},
                              cache, offline, log)
+    for key in ("filing", "filing_prior"):
+        sources.detach_attachments({k: v[key] for k, v in docs.items() if key in v}, cache, log)
     sources.download_filings({k: v["holdings"] for k, v in docs.items() if "holdings" in v},
                              cache, offline, log, folder="holdings")
     sources.download_lighthouse({k: v["lighthouse"] for k, v in docs.items()}, cache, offline, log)

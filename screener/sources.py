@@ -11,6 +11,7 @@ Only documents published on or before `as_of` are eligible.
 """
 import os
 import re
+import subprocess
 import time
 
 import requests
@@ -140,6 +141,33 @@ def download_filings(filings, cache_dir, offline, log=print, folder="filings"):
         f["status"] = "OK" if ok else "DOWNLOAD_FAILED"
         log(f"  {'downloaded' if ok else 'FAILED    '} {f['file']}")
         time.sleep(0.15)
+
+
+def detach_attachments(filings, cache_dir, log=print, folder="filings"):
+    """Some issuers file a short cover PDF with the accounts embedded as
+    attachments (PDF portfolio). Each embedded PDF is saved next to it as
+    <file>__att<N>.pdf, so it can be read and cited by page like any filing."""
+    d = os.path.join(cache_dir, folder)
+    for f in filings.values():
+        if f.get("status") != "OK":
+            continue
+        pdf = os.path.join(d, f["file"])
+        try:
+            out = subprocess.run(["pdfdetach", "-list", pdf], capture_output=True, text=True,
+                                 errors="replace", timeout=60).stdout
+        except (subprocess.SubprocessError, OSError):
+            continue
+        att = [(int(m.group(1)), m.group(2)) for m in re.finditer(r"^(\d+):\s*(.+)$", out, re.M)]
+        f["attachments"] = []
+        for n, name in att:
+            if not name.lower().endswith(".pdf"):
+                continue
+            dest = os.path.join(d, f"{f['file'][:-4]}__att{n}.pdf")
+            if not os.path.exists(dest):
+                subprocess.run(["pdfdetach", "-save", str(n), "-o", dest, pdf], capture_output=True, timeout=120)
+            f["attachments"].append({"file": os.path.basename(dest), "name": name})
+        if f["attachments"]:
+            log(f"  {f['file']}: {len(f['attachments'])} embedded PDF(s) saved")
 
 
 # ------------------------------------------------------------- Lighthouse sheets
