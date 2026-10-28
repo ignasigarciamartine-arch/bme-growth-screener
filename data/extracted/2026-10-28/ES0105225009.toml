@@ -1,0 +1,13 @@
+isin = "ES0105225009"
+name = "ROBOT"
+# FY2025 pack 05225_OtraInfRelev_20260413.pdf is scanned end to end (no text layer): read through OCR.
+# Only the opinion is entered: it decides the case (F7 FAIL). The text parse had read this report as CLEAN.
+
+[[figure]]
+metric = "audit_opinion"
+value = "QUALIFIED"
+scale = 1
+file = "05225_OtraInfRelev_20260413.pdf"
+page = 3
+method = "ocr"
+note = "RSM, individual FY2025: 'Opinion con salvedades'. Loans to loss-making subsidiaries with negative equity are not impaired; equity overstated by 877,295 EUR. The FY2024 opinion (another auditor) had the same qualification."
