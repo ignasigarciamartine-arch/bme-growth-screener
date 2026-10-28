@@ -1,0 +1,13 @@
+isin = "ES0143328005"
+name = "GRIÑÓ ECOLOGIC"
+# Free float alone decides the case (F6 FAIL): the controlling holder leaves at most 11.76%.
+# Holdings filing at 30-Jun-2026: 43328_OtraInfRelev_20260709.pdf.
+
+[[figure]]
+metric = "excluded_holding_pct"
+value = 88.24
+scale = "pct"
+file = "43328_OtraInfRelev_20260709.pdf"
+page = 1
+method = "pdftotext"
+note = "Corporacio Grino S.L., controlling holder (parent of the group)"

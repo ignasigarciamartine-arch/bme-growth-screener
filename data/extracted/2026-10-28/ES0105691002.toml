@@ -1,0 +1,22 @@
+isin = "ES0105691002"
+name = "KNOWMAD MOOD"
+# Free float alone decides the case (F6 FAIL): the two founders, both directors who sign the FY2025 accounts
+# (05691_OtraInfRelev_20260423.pdf p72), hold 97.69%. Holdings filing at 30-Jun-2026: 05691_OtraInfRelev_20260706.pdf.
+
+[[figure]]
+metric = "excluded_holding_pct"
+value = 52.72
+scale = "pct"
+file = "05691_OtraInfRelev_20260706.pdf"
+page = 1
+method = "pdftotext"
+note = "Jose Manuel Rufino Fernandez, founder, chairman and CEO"
+
+[[figure]]
+metric = "excluded_holding_pct"
+value = 44.97
+scale = "pct"
+file = "05691_OtraInfRelev_20260706.pdf"
+page = 1
+method = "pdftotext"
+note = "Miguel Angel Sacristan Salvador, founder and director"
