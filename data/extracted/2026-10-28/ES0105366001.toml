@@ -1,0 +1,121 @@
+isin = "ES0105366001"
+name = "ALQUIBER QUALITY"
+# Individual accounts (no group), Spanish GAAP, euros with cents.
+# FY2025: 05366_OtraInfRelev_20260408.pdf. FY2023: 05366_OtraInfRelev_20240410.pdf.
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 164278665.12
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 35
+method = "pdftotext"
+note = "P&L, Importe neto de la cifra de negocio"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 144473898.68
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 35
+method = "pdftotext"
+note = "P&L, 2024 comparative"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 126122134.97
+scale = 1
+file = "05366_OtraInfRelev_20240410.pdf"
+page = 34
+method = "pdftotext"
+note = "P&L FY2023"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 100364652.95
+scale = 1
+file = "05366_OtraInfRelev_20240410.pdf"
+page = 34
+method = "pdftotext"
+note = "P&L FY2023, 2022 comparative"
+
+[[figure]]
+metric = "ebit"
+year = 2025
+value = 21883458.07
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 35
+method = "pdftotext"
+note = "Resultado de explotacion"
+
+[[figure]]
+metric = "da"
+year = 2025
+value = 73255766.27
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 35
+method = "pdftotext"
+note = "Amortizacion del inmovilizado (rental fleet)"
+
+[[figure]]
+metric = "gross_debt"
+year = 2025
+value = 132390859.82
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 34
+method = "pdftotext"
+note = "Deudas a largo plazo (bank 68.3M, finance leases 59.6M, other 4.5M)"
+
+[[figure]]
+metric = "gross_debt"
+year = 2025
+value = 122224766.57
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 34
+method = "pdftotext"
+note = "Deudas a corto plazo (bank 56.2M, finance leases 66.0M, other 0.04M)"
+
+[[figure]]
+metric = "cash"
+year = 2025
+value = 16828378.35
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 33
+method = "pdftotext"
+note = "Efectivo y otros activos liquidos equivalentes"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 25
+method = "ocr"
+note = "BDO, FY2025: unmodified opinion (scanned report)"
+
+[[figure]]
+metric = "going_concern"
+value = false
+scale = 1
+file = "05366_OtraInfRelev_20260408.pdf"
+page = 25
+method = "ocr"
+note = "Opinion -> Fundamento -> Cuestiones clave; no material-uncertainty section"
+
+[[figure]]
+metric = "free_float_pct"
+value = 22.4
+scale = "pct"
+file = "alq_20261012_1.pdf"
+page = 1
+method = "pdftotext"
+note = "Lighthouse 12-Oct-2026: M.A. Acebes 41.1, M. Acebes 17.9, M. Acebes 17.5, treasury 1.0, free float 22.4. Cross-check, holdings filing 05366_OtraInfRelev_20260706.pdf p1 (30-Jun-2026): Acebes family 76.57% (Sebeca Ikap 55.94 + direct 20.63); 100 - 76.57 - 1.0 = 22.43."
