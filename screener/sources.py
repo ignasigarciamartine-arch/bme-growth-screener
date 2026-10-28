@@ -143,29 +143,38 @@ def download_filings(filings, cache_dir, offline, log=print, folder="filings"):
         time.sleep(0.15)
 
 
+def _detach(d, file, depth=2):
+    """Save the PDFs embedded in d/file as <file>__att<N>.pdf, recursively:
+    portfolios nest (a cover holding a cover holding the accounts)."""
+    try:
+        out = subprocess.run(["pdfdetach", "-list", os.path.join(d, file)], capture_output=True,
+                             text=True, errors="replace", timeout=60).stdout
+    except (subprocess.SubprocessError, OSError):
+        return []
+    saved = []
+    for m in re.finditer(r"^(\d+):\s*(.+)$", out, re.M):
+        n, name = int(m.group(1)), m.group(2).strip()
+        if not name.lower().endswith(".pdf"):
+            continue
+        dest = f"{file[:-4]}__att{n}.pdf"
+        if not os.path.exists(os.path.join(d, dest)):
+            subprocess.run(["pdfdetach", "-save", str(n), "-o", os.path.join(d, dest),
+                            os.path.join(d, file)], capture_output=True, timeout=120)
+        saved.append({"file": dest, "name": name})
+        if depth > 1:
+            saved += _detach(d, dest, depth - 1)
+    return saved
+
+
 def detach_attachments(filings, cache_dir, log=print, folder="filings"):
     """Some issuers file a short cover PDF with the accounts embedded as
-    attachments (PDF portfolio). Each embedded PDF is saved next to it as
-    <file>__att<N>.pdf, so it can be read and cited by page like any filing."""
+    attachments (PDF portfolio). Each embedded PDF is saved next to it, so it
+    can be read and cited by page like any filing."""
     d = os.path.join(cache_dir, folder)
     for f in filings.values():
         if f.get("status") != "OK":
             continue
-        pdf = os.path.join(d, f["file"])
-        try:
-            out = subprocess.run(["pdfdetach", "-list", pdf], capture_output=True, text=True,
-                                 errors="replace", timeout=60).stdout
-        except (subprocess.SubprocessError, OSError):
-            continue
-        att = [(int(m.group(1)), m.group(2)) for m in re.finditer(r"^(\d+):\s*(.+)$", out, re.M)]
-        f["attachments"] = []
-        for n, name in att:
-            if not name.lower().endswith(".pdf"):
-                continue
-            dest = os.path.join(d, f"{f['file'][:-4]}__att{n}.pdf")
-            if not os.path.exists(dest):
-                subprocess.run(["pdfdetach", "-save", str(n), "-o", dest, pdf], capture_output=True, timeout=120)
-            f["attachments"].append({"file": os.path.basename(dest), "name": name})
+        f["attachments"] = _detach(d, f["file"])
         if f["attachments"]:
             log(f"  {f['file']}: {len(f['attachments'])} embedded PDF(s) saved")
 
