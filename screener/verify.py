@@ -9,7 +9,8 @@ written out: a DISCREPANCY is often a stale sheet, not a wrong number.
 
 With figures read from the accounts, every one marked `pdftotext` must appear
 on the page it cites; a figure read from a page image (`agent-read`) cannot be
-checked against text and is reported as such.
+checked against the text layer and is reported as such; the same holds
+for a scanned page read through OCR (`ocr`).
 
 A PASS whose revenue is not confirmed, or that rests on a figure missing from
 its page, goes back to NEEDS_DATA.
@@ -53,7 +54,7 @@ def _page_numbers(cache, file, page):
 
 def check_figure(f, cache):
     """FOUND / NOT_FOUND / PAGE_IMAGE / TEXT_VALUE / NO_FILE for one figure."""
-    if f["method"] == "agent-read":
+    if f["method"] in ("agent-read", "ocr"):
         return "PAGE_IMAGE"
     if not isinstance(f["value"], (int, float)) or isinstance(f["value"], bool):
         return "TEXT_VALUE"

@@ -12,7 +12,8 @@ the file and page it comes from and the method used to read it:
     scale = 1000                  # 1 = euros, 1000 = thousands of euros; "pct" for percentages
     file = "05517_OtraInfRelev_20260430.pdf"
     page = 23                     # 1-based page of the PDF
-    method = "pdftotext"          # or "agent-read" (page read as an image)
+    method = "pdftotext"          # or "agent-read" (page image read by the agent)
+                                  # or "ocr" (scanned page, tesseract text read by the agent)
     note = "Consolidated P&L, line 1"
 
 A figure that is not in this file is not invented: the filter stays NEEDS_DATA.
@@ -43,7 +44,7 @@ import tomllib
 
 METRICS = {"revenue", "ebit", "da", "gross_debt", "cash", "free_float_pct",
            "audit_opinion", "going_concern"}
-METHODS = {"pdftotext", "agent-read"}
+METHODS = {"pdftotext", "agent-read", "ocr"}
 
 
 def _check(isin, f):
