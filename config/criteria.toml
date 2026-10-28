@@ -1,0 +1,97 @@
+# Screening criteria for BME Growth.
+#
+# Fixed on `fixed_on`, BEFORE the universe was examined. Thresholds are never
+# edited in place: a change is appended to [[changelog]] with date, filter and
+# reason, so any result can be traced to the rules that produced it.
+#
+# Rule that applies to every filter: missing data gives NEEDS_DATA, never PASS.
+
+[criteria]
+fixed_on = "2026-07-25"
+mandate = "EUR 1-10M minority growth capital (equity or convertible) in a listed small cap"
+
+[universe]
+market = "BME Growth"
+segment = "BMEGrowth"          # mtfSegment in the BME API
+as_of = "2026-07-25"           # universe snapshot date (prices: last close on or before)
+
+# Removed before screening: not operating companies.
+[[universe.exclude_subsector]]
+sector = "07"
+subsector = "02"
+reason = "SOCIMI (Spanish REIT): property vehicle, outside an operating-company mandate"
+
+# Removed one by one, with the reason written down.
+[[universe.exclude_isin]]
+isin = "ES0105283008"
+name = "DOMO ACTIVOS"
+reason = "Property vehicle: same rationale as the SOCIMI exclusion"
+
+[[universe.exclude_isin]]
+isin = "ES0105852000"
+name = "SANTA ANA"
+reason = "Property vehicle: same rationale as the SOCIMI exclusion"
+
+[[universe.exclude_isin]]
+isin = "ES0105093001"
+name = "GIGAS HOSTING"
+reason = "Already held by the reference fund: not origination"
+
+[[universe.exclude_isin]]
+isin = "ES0105650008"
+name = "SUBSTRATE ARTIFICIAL"
+reason = "Analysed separately in Jul-2026 (source of the integrity tests); not recycled as a case"
+
+# ---------------------------------------------------------------- hard filters
+# Any FAIL eliminates. F8 is a judgement call and is reviewed by hand.
+
+[filters.F1]
+label = "Market capitalisation"
+min_eur = 10_000_000
+max_eur = 200_000_000
+why = "A EUR 1-10M ticket should be ~5-20% of the company: meaningful, not control"
+
+[filters.F2]
+label = "Revenue, last audited year"
+min_eur_m = 5.0
+why = "A running business, not a project or a shell"
+
+[filters.F3]
+label = "EBITDA, last audited year"
+rule = "positive"
+why = "Growth capital, not distressed"
+
+[filters.F4]
+label = "Revenue CAGR, 3 years"
+min_pct = 0.0
+years = 3
+why = "Without growth there is no expansion to fund"
+
+[filters.F5]
+label = "Net financial debt / EBITDA"
+max_x = 3.5
+why = "Above this a convertible is rescue financing, not growth financing"
+
+[filters.F6]
+label = "Free float"
+min_pct = 15.0
+why = "Enough liquidity to build and exit a position"
+
+[filters.F7]
+label = "Audit opinion"
+rule = "clean, and no material uncertainty on going concern"
+why = "Accounts that can be relied on"
+
+[filters.F8]
+label = "Catalyst and instrument fit"
+manual = true
+rule = "dated, quantified use of funds (expansion, M&A or shareholder liquidity) and a reason it must be equity, not bank debt"
+why = "A good company is not an opportunity unless it needs this money"
+
+# ------------------------------------------------------------------- changelog
+
+[[changelog]]
+date = "2026-07-28"
+filter = "F6"
+change = "Definition made precise; threshold unchanged at 15%. Free float excludes (a) founders and controlling holders, (b) directors and senior management, (c) employees and partner vehicles, (d) treasury stock. Financial investors without a board seat or employment link count as free float, even above 5%."
+reason = "The undefined term decided whole cases (one company read 14.5% or 22.0% depending on it). Applied retroactively to every screened company, not only to survivors."
