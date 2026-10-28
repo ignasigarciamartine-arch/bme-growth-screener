@@ -39,8 +39,11 @@ def build(as_of, segment, log=print):
     after_from, after_to = _ymd(as_of + dt.timedelta(days=1)), _ymd(today)
 
     listed = {c["isin"]: c for c in bme.listed_companies(segment)}
-    delisted = bme.corporate_actions("Delistings", segment, after_from, after_to)
-    admissions = bme.corporate_actions("NewListings", segment, after_from, after_to)
+    if as_of < today:
+        delisted = bme.corporate_actions("Delistings", segment, after_from, after_to)
+        admissions = bme.corporate_actions("NewListings", segment, after_from, after_to)
+    else:                             # universe as of today: nothing to undo
+        delisted, admissions = [], []
     new = {a["isin"] for a in admissions if a.get("admissionType") == "NewListing"}
     added_shares = {}
     for a in admissions:

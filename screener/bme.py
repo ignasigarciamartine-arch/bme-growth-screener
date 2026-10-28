@@ -63,6 +63,13 @@ def financial_information(year_from, year_to):
                  toYear=year_to, order="Period DESC")
 
 
+def documents(company_key, doc_type, date_to):
+    """Filings of one type for one issuer, newest first (e.g. '006':
+    significant shareholdings, published every 30 June and 31 December)."""
+    return paged("v1/EQ/MtfEquity/Documents", companyKey=company_key, types=doc_type,
+                 to=date_to)
+
+
 def download_document(url_path, dest):
     """Filing URLs are relative to the API root. Returns True on a real PDF."""
     r = requests.get(API.rstrip("/") + url_path, headers={"User-Agent": "Mozilla/5.0"},

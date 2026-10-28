@@ -81,15 +81,50 @@ def select_filings(records, issuer_code, as_of):
     }
 
 
+def select_prior(records, issuer_code, as_of, latest_year, gap=2):
+    """The accounts `gap` years before the latest ones. With the comparatives
+    each set carries, latest + prior give the four revenue figures F4 needs."""
+    if not latest_year:
+        return {"status": "NO_DOC", "n_docs": 0}
+    rs = [r for r in records if (r.get("financialInfoYear") or 0) == latest_year - gap]
+    return select_filings(rs, issuer_code, as_of)
+
+
 def harvest_filings(candidates, as_of, log=print):
-    log(f"  filings inventory {as_of.year - 2}-{as_of.year} ...")
-    recs = bme.financial_information(as_of.year - 2, as_of.year)
+    """Returns {isin: (latest accounts, accounts two years earlier)}."""
+    log(f"  filings inventory {as_of.year - 3}-{as_of.year} ...")
+    recs = bme.financial_information(as_of.year - 3, as_of.year)
     log(f"  {len(recs)} filings in the API")
-    return {c["isin"]: select_filings(recs, c["issuer_code"], as_of) for c in candidates}
+    out = {}
+    for c in candidates:
+        latest = select_filings(recs, c["issuer_code"], as_of)
+        out[c["isin"]] = (latest, select_prior(recs, c["issuer_code"], as_of, latest.get("year")))
+    return out
 
 
-def download_filings(filings, cache_dir, offline, log=print):
-    d = os.path.join(cache_dir, "filings")
+def harvest_holdings(candidates, as_of, log=print):
+    """Latest 'Participaciones significativas' (type 006) published by as_of:
+    holders of 5% or more and directors and managers with 1% or more. It is
+    the primary source for free float (F6)."""
+    out = {}
+    for c in candidates:
+        recs = bme.documents(c["issuer_code"], "006", as_of.strftime("%Y%m%d"))
+        recs.sort(key=lambda r: (r.get("date") or "", r.get("hour") or ""), reverse=True)
+        if not recs:
+            out[c["isin"]] = {"status": "NO_DOC", "n_docs": 0}
+        else:
+            r = recs[0]
+            out[c["isin"]] = {"status": "OK", "n_docs": len(recs), "title": _title(r),
+                              "date": r.get("date"), "size": r.get("size"), "url": r.get("url"),
+                              "file": os.path.basename(r.get("url") or "")}
+        time.sleep(0.15)
+    log(f"  significant-holdings filings found for "
+        f"{sum(v['status'] == 'OK' for v in out.values())} of {len(out)}")
+    return out
+
+
+def download_filings(filings, cache_dir, offline, log=print, folder="filings"):
+    d = os.path.join(cache_dir, folder)
     os.makedirs(d, exist_ok=True)
     for isin, f in filings.items():
         if f["status"] != "OK":
