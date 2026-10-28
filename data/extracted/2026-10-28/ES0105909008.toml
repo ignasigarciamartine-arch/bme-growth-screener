@@ -1,0 +1,93 @@
+isin = "ES0105909008"
+name = "TREE TECHNOLOGY"
+# Individual accounts FY2025, 05909_OtraInfRelev_20260429.pdf (KPMG). Listed Jan-2026: no FY2023 accounts in
+# BME, so F4 stays open; F5 already fails. Net debt at 3.54x EBITDA is driven by 'otros pasivos financieros' (1.82M),
+# which the company itself counts in its own net financial debt (results presentation, same pack).
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 7_239_987
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 25
+method = "agent-read"
+note = "P&L, Importe neto de la cifra de negocios (text layer misaligned)"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 7_130_196
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 25
+method = "agent-read"
+note = "P&L, 2024 comparative"
+
+[[figure]]
+metric = "ebit"
+year = 2025
+value = 500_567
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 25
+method = "agent-read"
+note = "Resultado de explotacion"
+
+[[figure]]
+metric = "da"
+year = 2025
+value = 147_995
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 25
+method = "agent-read"
+note = "Amortizacion del inmovilizado; EBIT + D&A = 648,562, the EBITDA the company reports"
+
+[[figure]]
+metric = "gross_debt"
+year = 2025
+value = 1_586_982
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 24
+method = "pdftotext"
+note = "Deudas a largo plazo (bank 500,000 + other 1,086,982)"
+
+[[figure]]
+metric = "gross_debt"
+year = 2025
+value = 2_192_132
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 24
+method = "pdftotext"
+note = "Deudas a corto plazo (bank 1,456,567 + other 735,565)"
+
+[[figure]]
+metric = "cash"
+year = 2025
+value = 1_480_132
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 45
+method = "pdftotext"
+note = "Note 12, cash at 31-Dec-2025 (the balance-sheet line on p23 is misaligned in the text layer)"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 18
+method = "pdftotext"
+note = "KPMG, FY2025: unmodified opinion"
+
+[[figure]]
+metric = "going_concern"
+value = false
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 18
+method = "pdftotext"
+note = "Opinion -> Fundamento -> Aspectos mas relevantes; no material-uncertainty section"
