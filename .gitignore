@@ -1,0 +1,6 @@
+# Downloaded documents and extracted text: fetched from the BME API, never versioned
+cache/
+# Run outputs
+runs/
+__pycache__/
+*.pyc
