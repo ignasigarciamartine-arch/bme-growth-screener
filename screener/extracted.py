@@ -1,9 +1,14 @@
-"""Figures read from the documents by hand, one file per company.
+"""Documented readings: figures read from the documents page by page, one file
+per company, versioned with the repository.
 
-pdftotext cannot read every set of accounts: scanned pages, management-report
-tables whose columns drift, audit opinions printed as images. Those figures are
-read page by page and written to data/extracted/<as_of>/<ISIN>.toml, each with
-the file and page it comes from and the method used to read it:
+The text parser cannot read every set of accounts: scanned pages,
+management-report tables whose columns drift, audit opinions printed as images.
+Those figures are read page by page and written to
+data/extracted/<as_of>/<ISIN>.toml, each with the file and page it comes from
+and the method used to read it. Every run uses them as data and re-checks each
+one on its page (verify.py): a text-layer figure must be in the text of the
+page; a figure read on a page image is searched by local OCR when Tesseract is
+installed, and is reported as not re-verified when it is not.
 
     [[figure]]
     metric = "revenue"            # see METRICS
@@ -12,7 +17,10 @@ the file and page it comes from and the method used to read it:
     scale = 1000                  # 1 = euros, 1000 = thousands of euros; "pct" for percentages
     file = "05517_OtraInfRelev_20260430.pdf"
     page = 23                     # 1-based page of the PDF
-    method = "pdftotext"          # or "agent-read" (page image read by the agent)
+    method = "pdftotext"          # read on the PDF's text layer (the readings of
+                                  #   2026-10-28 used poppler's pdftotext; the check
+                                  #   now reads the same layer with PDFium)
+                                  # or "agent-read" (page image read by the agent)
                                   # or "ocr" (scanned page, tesseract text read by the agent)
     note = "Consolidated P&L, line 1"
 

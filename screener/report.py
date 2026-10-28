@@ -39,6 +39,40 @@ def funnel_lines(stages, screened, cfg):
     return lines
 
 
+SRC_COLUMNS = ("src_revenue", "src_ebitda", "src_net_debt", "src_free_float",
+               "src_revenue_history", "src_opinion")
+
+
+def provenance_lines(screened, figure_checks, ocr):
+    """Which figures were extracted by the code on this run and which are
+    documented readings (data/extracted), and how each reading checked out."""
+    auto = doc = 0
+    for r in screened:
+        for k in SRC_COLUMNS:
+            v = r.get(k) or ""
+            auto += v.count("(auto: ")
+            doc += v.count("(documented: ")
+    text = [f for f in figure_checks if f["check_kind"] == "automatic"]
+    image = [f for f in figure_checks if f["check_kind"] == "documented"]
+
+    def tally(rows):
+        c = {}
+        for f in rows:
+            c[f["check"]] = c.get(f["check"], 0) + 1
+        return ", ".join(f"{k} {v}" for k, v in sorted(c.items())) or "-"
+    return [
+        "",
+        "  Where the filter inputs come from (source cells in screened.csv):",
+        f"    auto: extracted by the code on this run (Lighthouse table, opinion regex) {auto:>4}",
+        f"    documented: read page by page, versioned in data/extracted          {doc:>4}",
+        "",
+        f"  Documented readings ({len(figure_checks)}), re-checked on this run (extracted_check.csv):",
+        f"    read on the text layer ({len(text)}), number searched on its page: {tally(text)}",
+        f"    read on page images ({len(image)}), "
+        f"{'text layer, then local OCR' if ocr else 'text layer only (no OCR)'}: {tally(image)}",
+    ]
+
+
 def _m(v, nd=1):
     return "-" if v in (None, "") else f"{v:,.{nd}f}"
 
@@ -60,7 +94,7 @@ def pass_lines(screened):
     return out
 
 
-def write(out_dir, stages, screened, checks, cfg, figure_checks=()):
+def write(out_dir, stages, screened, checks, cfg, figure_checks=(), ocr=False, notes=()):
     os.makedirs(out_dir, exist_ok=True)
     stage_rows = []
     for r in stages["listed"]:
@@ -81,7 +115,8 @@ def write(out_dir, stages, screened, checks, cfg, figure_checks=()):
     _csv(os.path.join(out_dir, "verify.csv"), checks)
     _csv(os.path.join(out_dir, "extracted_check.csv"), list(figure_checks))
 
-    lines = funnel_lines(stages, screened, cfg)
+    lines = (funnel_lines(stages, screened, cfg)
+             + provenance_lines(screened, list(figure_checks), ocr) + list(notes))
     md = ["# Funnel", "", "```", *lines, "```", "", "## Screened candidates", "",
           "| Company | Verdict | Fails | Needs data |", "|---|---|---|---|"]
     md += [f"| {r['name']} | {r['verdict']} | {r['fails'] or '-'} | {r['needs_data'] or '-'} |"

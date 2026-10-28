@@ -32,12 +32,19 @@ def funnel(universe, cfg):
     return stages
 
 
+# Methods of the parser, run on every execution. Every other method is a
+# documented reading from data/extracted (see extracted.py).
+AUTOMATIC_METHODS = ("pdfplumber", "text-layer regex")
+
+
 def _fmt(src):
+    """'file p.N (auto: method)' or 'file p.N (documented: method)'."""
     if not src:
         return None
     if isinstance(src, list):
         return " + ".join(_fmt(x) for x in src)
-    return f"{src['file']} p.{src['page']} ({src['method']})"
+    kind = "auto" if src["method"] in AUTOMATIC_METHODS else "documented"
+    return f"{src['file']} p.{src['page']} ({kind}: {src['method']})"
 
 
 def inputs(lh, ex):
@@ -133,7 +140,7 @@ def evaluate(company, lh, filing, cfg, ex=None):
     op = ex.get("opinion", filing.get("opinion"))
     gc = ex.get("going_concern", filing.get("going_concern"))
     src["opinion"] = ex["sources"].get("opinion") if "opinion" in ex else (
-        {"file": filing.get("file"), "page": "-", "method": "pdftotext regex"} if op else None)
+        {"file": filing.get("file"), "page": "-", "method": "text-layer regex"} if op else None)
     if op in ("QUALIFIED", "ADVERSE", "DISCLAIMER") or gc:
         res["F7"] = FAIL
     elif op == "CLEAN":
