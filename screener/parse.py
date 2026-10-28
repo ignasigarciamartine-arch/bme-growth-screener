@@ -1,6 +1,6 @@
 """Step 2: read the documents.
 
-Audited accounts (pdftotext -layout):
+Audited accounts (text layer, read with PDFium):
   Automated, because it is robust: auditor, type of opinion, going-concern
   uncertainty, correction of errors, whether the document is a full set of
   accounts. Financial lines are kept only as CANDIDATES with file and page:
@@ -13,8 +13,7 @@ Lighthouse sheets (pdfplumber):
 """
 import os
 import re
-import subprocess
-
+from .pdf import page_texts
 from .text import deaccent, es_number
 
 AUDITORS = [
@@ -53,13 +52,15 @@ NUM = re.compile(r"\(?-?\d{1,3}(?:\.\d{3})+(?:,\d+)?\)?|\(?-?\d+,\d+\)?")
 
 
 def pdf_text(pdf, txt):
+    """Text layer of the PDF, pages separated by form feeds, cached in txt."""
     if not (os.path.exists(txt) and os.path.getsize(txt) > 500):
         os.makedirs(os.path.dirname(txt), exist_ok=True)
         try:
-            subprocess.run(["pdftotext", "-layout", "-enc", "UTF-8", pdf, txt],
-                           check=True, capture_output=True, timeout=420)
-        except (subprocess.SubprocessError, OSError):
+            pages = page_texts(pdf)
+        except Exception:                     # damaged or encrypted PDF
             return None
+        with open(txt, "w", encoding="utf-8") as f:
+            f.write("\f".join(pages))
     raw = open(txt, encoding="utf-8", errors="replace").read()
     return deaccent("".join(c if ord(c) < 0x2500 else " " for c in raw))
 
@@ -88,6 +89,33 @@ def _units(text):
     return 1
 
 
+def opinion(sc):
+    """Type of opinion in the text of an audit report, most severe first."""
+    sc = (sc or "").lower()
+    if not sc:
+        return None
+    if re.search(r"denegacion\s+de\s+opinion|abstencion\s+de\s+opinion", sc):
+        return "DISCLAIMER"
+    if re.search(r"opinion\s+(desfavorable|adversa)", sc):
+        return "ADVERSE"
+    if re.search(r"opinion\s+con\s+salvedad", sc):
+        return "QUALIFIED"
+    if re.search(r"opinion\s+(favorable|no\s+modificada)", sc) or \
+            re.search(r"expresan?,?\s+en\s+todos\s+los\s+aspectos\s+significativos", sc) or \
+            re.search(r"expresan?\s+la\s+imagen\s+fiel", sc):
+        return "CLEAN"
+    return None
+
+
+def going_concern(sc):
+    """Going concern counts only as the auditor's own section heading. The
+    standard responsibilities paragraph ("concluimos sobre si existe o no una
+    incertidumbre material ... dudas significativas sobre la capacidad") is in
+    every report and is not a finding."""
+    return bool(re.search(r"incertidumbre\s+material\s+relacionada\s+con\s+la\s+empresa\s+en\s+funcionamiento",
+                          (sc or "").lower()))
+
+
 def audit_signals(text):
     """The opinion is classified only inside the audit report: 'salvedades'
     also appears in boilerplate elsewhere in the notes."""
@@ -99,28 +127,12 @@ def audit_signals(text):
         # The report's first page is sometimes an image, so the heading is
         # missing from the text. The report opens the document: read its start.
         sc = "\f".join(text.split("\f")[:12]).lower()
-    op = None
-    if sc:                                    # most severe first
-        if re.search(r"denegacion\s+de\s+opinion|abstencion\s+de\s+opinion", sc):
-            op = "DISCLAIMER"
-        elif re.search(r"opinion\s+(desfavorable|adversa)", sc):
-            op = "ADVERSE"
-        elif re.search(r"opinion\s+con\s+salvedad", sc):
-            op = "QUALIFIED"
-        elif re.search(r"opinion\s+(favorable|no\s+modificada)", sc) or \
-                re.search(r"expresan?,?\s+en\s+todos\s+los\s+aspectos\s+significativos", sc) or \
-                re.search(r"expresan?\s+la\s+imagen\s+fiel", sc):
-            op = "CLEAN"
-    # Going concern counts only as the auditor's own section heading. The
-    # standard responsibilities paragraph ("concluimos sobre si existe o no una
-    # incertidumbre material ... dudas significativas sobre la capacidad") is in
-    # every report and is not a finding.
+    op = opinion(sc)
     # The finding itself ("una incertidumbre material que PUEDE generar dudas",
     # singular) also counts wherever it is disclosed: under NIA-ES 570 the
     # auditor must then report on it.
-    gc = bool(re.search(r"incertidumbre\s+material\s+relacionada\s+con\s+la\s+empresa\s+en\s+funcionamiento", sc)
-              or re.search(r"incertidumbre\s+material\s+que\s+puede\s+generar\s+dudas\s+significativas",
-                           text, re.I))
+    gc = going_concern(sc) or bool(re.search(
+        r"incertidumbre\s+material\s+que\s+puede\s+generar\s+dudas\s+significativas", text, re.I))
     err = bool(re.search(r"correccion\s+de\s+errores[^.]{0,200}(ha\s+supuesto|se\s+ha\s+reexpres)",
                          text, re.I))
     return {"auditor": firm, "opinion": op, "going_concern": gc, "error_correction": err,
@@ -130,7 +142,7 @@ def audit_signals(text):
 def parse_filing(pdf, txt):
     text = pdf_text(pdf, txt)
     if text is None:
-        return {"parse": "PDFTOTEXT_FAILED"}
+        return {"parse": "TEXT_FAILED"}
     pages = text.split("\f")
     out = {"file": os.path.basename(pdf), "pages": len(pages), "chars": len(text),
            "pages_without_text": sum(1 for p in pages if len(p.strip()) < 200),

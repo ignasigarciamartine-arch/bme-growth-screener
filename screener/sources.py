@@ -11,12 +11,11 @@ Only documents published on or before `as_of` are eligible.
 """
 import os
 import re
-import subprocess
 import time
 
 import requests
 
-from . import bme
+from . import bme, pdf
 from .text import deaccent, norm_name
 
 LH_INDEX = "https://institutodeanalistas.com/lighthouse/informes/"
@@ -147,19 +146,17 @@ def _detach(d, file, depth=2):
     """Save the PDFs embedded in d/file as <file>__att<N>.pdf, recursively:
     portfolios nest (a cover holding a cover holding the accounts)."""
     try:
-        out = subprocess.run(["pdfdetach", "-list", os.path.join(d, file)], capture_output=True,
-                             text=True, errors="replace", timeout=60).stdout
-    except (subprocess.SubprocessError, OSError):
+        embedded = pdf.attachments(os.path.join(d, file))
+    except Exception:                         # damaged PDF: nothing to detach
         return []
     saved = []
-    for m in re.finditer(r"^(\d+):\s*(.+)$", out, re.M):
-        n, name = int(m.group(1)), m.group(2).strip()
+    for n, name, data in embedded:
         if not name.lower().endswith(".pdf"):
             continue
         dest = f"{file[:-4]}__att{n}.pdf"
         if not os.path.exists(os.path.join(d, dest)):
-            subprocess.run(["pdfdetach", "-save", str(n), "-o", os.path.join(d, dest),
-                            os.path.join(d, file)], capture_output=True, timeout=120)
+            with open(os.path.join(d, dest), "wb") as f:
+                f.write(data)
         saved.append({"file": dest, "name": name})
         if depth > 1:
             saved += _detach(d, dest, depth - 1)
