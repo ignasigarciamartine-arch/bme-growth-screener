@@ -39,7 +39,28 @@ def funnel_lines(stages, screened, cfg):
     return lines
 
 
-def write(out_dir, stages, screened, checks, cfg):
+def _m(v, nd=1):
+    return "-" if v in (None, "") else f"{v:,.{nd}f}"
+
+
+def pass_lines(screened):
+    """Each PASS with the figures that decide it and where they come from."""
+    out = []
+    for r in (x for x in screened if x["verdict"] == "PASS"):
+        out += [f"### {r['name']} ({r['isin']}), FY{r['fiscal_year']}", "",
+                f"- F1 market cap EUR {_m(r['market_cap_eur_m'])}M (BME close, snapshot)",
+                f"- F2 revenue EUR {_m(r['revenue_eur_m'], 2)}M: {r['src_revenue']}",
+                f"- F3 EBITDA EUR {_m(r['ebitda_eur_m'], 2)}M: {r['src_ebitda']}",
+                f"- F4 revenue CAGR 3y {_m(r['revenue_cagr_3y_pct'])}%: {r['src_revenue_history']}",
+                f"- F5 net debt EUR {_m(r['net_debt_eur_m'], 2)}M, {_m(r['nd_ebitda'], 2)}x EBITDA: "
+                f"{r['src_net_debt']}",
+                f"- F6 free float {_m(r['free_float_pct'])}%: {r['src_free_float']}",
+                f"- F7 opinion {r['audit_opinion']}, going concern {r['going_concern']}: {r['src_opinion']}",
+                ""]
+    return out
+
+
+def write(out_dir, stages, screened, checks, cfg, figure_checks=()):
     os.makedirs(out_dir, exist_ok=True)
     stage_rows = []
     for r in stages["listed"]:
@@ -58,12 +79,16 @@ def write(out_dir, stages, screened, checks, cfg):
     screened = sorted(screened, key=lambda r: (order[r["verdict"]], r["name"]))
     _csv(os.path.join(out_dir, "screened.csv"), screened)
     _csv(os.path.join(out_dir, "verify.csv"), checks)
+    _csv(os.path.join(out_dir, "extracted_check.csv"), list(figure_checks))
 
     lines = funnel_lines(stages, screened, cfg)
     md = ["# Funnel", "", "```", *lines, "```", "", "## Screened candidates", "",
           "| Company | Verdict | Fails | Needs data |", "|---|---|---|---|"]
     md += [f"| {r['name']} | {r['verdict']} | {r['fails'] or '-'} | {r['needs_data'] or '-'} |"
            for r in screened]
+    passes = pass_lines(screened)
+    if passes:
+        md += ["", "## PASS: figures and sources", ""] + passes
     with open(os.path.join(out_dir, "funnel.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(md) + "\n")
     return lines

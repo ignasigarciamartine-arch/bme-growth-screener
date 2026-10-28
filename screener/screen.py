@@ -32,27 +32,73 @@ def funnel(universe, cfg):
     return stages
 
 
-def evaluate(company, lh, filing, cfg):
+def _fmt(src):
+    if not src:
+        return None
+    if isinstance(src, list):
+        return " + ".join(_fmt(x) for x in src)
+    return f"{src['file']} p.{src['page']} ({src['method']})"
+
+
+def inputs(lh, ex):
+    """F2-F6 inputs and where each comes from.
+
+    Figures read from the accounts (data/extracted) come first: the accounts are
+    the primary source. The Lighthouse sheet fills a gap only when its actual
+    year is the same fiscal year, so one company's filters never mix years.
+    Free float is not a fiscal-year figure: the sheet is used as published.
+    """
+    ex = ex or {}
+    lh_page = lambda k: {"file": lh.get("file"), "method": "pdfplumber",
+                         "page": (lh.get("rows", {}).get(k) or {}).get("page")}
+    year = ex.get("year")
+    lh_same_year = year is None or str(lh.get("actual_year") or "").startswith(str(year))
+    out, src = {}, {}
+    for key, lh_key, row in (("revenue_m", "revenue_m", "revenue"), ("ebitda_m", "ebitda_m", "ebitda"),
+                             ("net_debt_m", "net_debt_m", "net_debt")):
+        name = row
+        if ex.get(key) is not None:
+            out[key], src[name] = ex[key], ex["sources"][name]
+        elif lh_same_year and lh.get(lh_key) is not None:
+            out[key], src[name] = lh[lh_key], lh_page(row)
+        else:
+            out[key] = None
+    if ex.get("free_float_pct") is not None:
+        out["free_float_pct"], src["free_float"] = ex["free_float_pct"], ex["sources"]["free_float"]
+    elif lh.get("free_float_pct") is not None:
+        out["free_float_pct"], src["free_float"] = lh["free_float_pct"], lh_page("free_float")
+    else:
+        out["free_float_pct"] = None
+    out["revenue_history"] = ex.get("revenue_history")
+    out["year"] = year
+    if ex.get("revenue_history"):
+        src["revenue_history"] = ex["sources"]["revenue_history"]
+    return out, src
+
+
+def evaluate(company, lh, filing, cfg, ex=None):
     F = cfg["filters"]
     res, notes = {}, {}
+    val, src = inputs(lh, ex)
+    ex = ex or {}
 
     m = company.get("market_cap_eur")
     m = float(m) if m not in (None, "") else None
     res["F1"] = NEEDS if m is None else (PASS if F["F1"]["min_eur"] <= m <= F["F1"]["max_eur"] else FAIL)
 
-    rev, ebitda = lh.get("revenue_m"), lh.get("ebitda_m")
-    nd, ff = lh.get("net_debt_m"), lh.get("free_float_pct")
+    rev, ebitda = val["revenue_m"], val["ebitda_m"]
+    nd, ff = val["net_debt_m"], val["free_float_pct"]
 
     res["F2"] = NEEDS if rev is None else (PASS if rev >= F["F2"]["min_eur_m"] else FAIL)
     res["F3"] = NEEDS if ebitda is None else (PASS if ebitda > 0 else FAIL)
 
-    # F4 needs years+1 audited revenue figures. Neither source gives a series
-    # of actuals today (Lighthouse shows one actual year plus estimates), so it
-    # stays open until someone reads the history from the accounts.
-    hist = lh.get("revenue_history")            # {year: revenue_m}, actuals only
+    # F4 needs years+1 audited revenue figures, consecutive and ending in the
+    # latest audited year. Lighthouse shows one actual year plus estimates, so
+    # the series comes from the accounts (data/extracted) or stays open.
+    hist = val["revenue_history"]               # {year: revenue_m}, actuals only
     n = F["F4"]["years"]
-    if hist and len(hist) >= n + 1:
-        ys = sorted(hist)[-(n + 1):]
+    ys = sorted(hist)[-(n + 1):] if hist else []
+    if len(ys) == n + 1 and ys[-1] - ys[0] == n and ys[-1] == val["year"]:
         cagr = ((hist[ys[-1]] / hist[ys[0]]) ** (1 / n) - 1) * 100 if hist[ys[0]] > 0 else None
         res["F4"] = NEEDS if cagr is None else (PASS if cagr > F["F4"]["min_pct"] else FAIL)
         notes["F4"] = None if cagr is None else round(cagr, 1)
@@ -73,8 +119,13 @@ def evaluate(company, lh, filing, cfg):
 
     res["F6"] = NEEDS if ff is None else (PASS if ff >= F["F6"]["min_pct"] else FAIL)
 
-    op = filing.get("opinion")
-    if op in ("QUALIFIED", "ADVERSE", "DISCLAIMER") or filing.get("going_concern"):
+    # An opinion read on its page (data/extracted) overrides the text parse,
+    # which cannot see reports printed as images.
+    op = ex.get("opinion", filing.get("opinion"))
+    gc = ex.get("going_concern", filing.get("going_concern"))
+    src["opinion"] = ex["sources"].get("opinion") if "opinion" in ex else (
+        {"file": filing.get("file"), "page": "-", "method": "pdftotext regex"} if op else None)
+    if op in ("QUALIFIED", "ADVERSE", "DISCLAIMER") or gc:
         res["F7"] = FAIL
     elif op == "CLEAN":
         res["F7"] = PASS
@@ -89,11 +140,17 @@ def evaluate(company, lh, filing, cfg):
         "isin": company["isin"], "name": company["name"],
         "market_cap_eur_m": round(m / 1e6, 1) if m else None,
         "revenue_eur_m": rev, "ebitda_eur_m": ebitda, "net_debt_eur_m": nd,
-        "nd_ebitda": notes.get("F5"), "free_float_pct": ff, "lighthouse_year": lh.get("actual_year"),
+        "nd_ebitda": notes.get("F5"), "free_float_pct": ff, "revenue_cagr_3y_pct": notes.get("F4"),
+        "fiscal_year": val["year"], "lighthouse_year": lh.get("actual_year"),
         "auditor": filing.get("auditor"), "audit_opinion": op,
-        "going_concern": filing.get("going_concern"),
+        "going_concern": gc,
         "restatement_declared": filing.get("restatement_declared"),
         **res, "verdict": verdict,
         "fails": ";".join(k for k, v in res.items() if v == FAIL),
         "needs_data": ";".join(k for k, v in res.items() if v == NEEDS),
+        "src_revenue": _fmt(src.get("revenue")), "src_ebitda": _fmt(src.get("ebitda")),
+        "src_net_debt": _fmt(src.get("net_debt")), "src_free_float": _fmt(src.get("free_float")),
+        "src_revenue_history": "; ".join(f"{y}: {_fmt(v)}" for y, v in
+                                         sorted((src.get("revenue_history") or {}).items())) or None,
+        "src_opinion": _fmt(src.get("opinion")),
     }
