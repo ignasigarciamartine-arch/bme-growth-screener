@@ -1,0 +1,24 @@
+isin = "ES0105634002"
+name = "ENERSIDE ENERGY"
+# Consolidated FY2025, 05634_OtraInfRelev_20260430_1.pdf. Revenue alone decides the case (F2 FAIL);
+# the group also reports a negative operating result of 5.3M (note on p72), not entered.
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 1_135_148
+scale = 1
+file = "05634_OtraInfRelev_20260430_1.pdf"
+page = 64
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 5_232_547
+scale = 1
+file = "05634_OtraInfRelev_20260430_1.pdf"
+page = 64
+method = "pdftotext"
+note = "Consolidated P&L, 2024 comparative"
