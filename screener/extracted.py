@@ -33,6 +33,12 @@ Definitions (fixed with the extraction, 2026-10-28):
                    financial investments are not netted (conservative).
   net_debt         gross_debt - cash. Computed.
   free_float_pct   As defined in config/criteria.toml (changelog 2026-07-28).
+  excluded_holding_pct
+                   One holding that the definition leaves out of the free float
+                   (founder, controlling holder, director), as printed in the
+                   significant-holdings filing. One entry per holder, added up:
+                   100 minus the sum is an UPPER bound on free float. It can
+                   fail F6 when the bound is below the bar; it never passes it.
   audit_opinion    CLEAN / QUALIFIED / ADVERSE / DISCLAIMER, read on the page
                    of the auditor's report that carries the opinion.
   going_concern    true if the report has a material-uncertainty section on
@@ -43,7 +49,7 @@ import os
 import tomllib
 
 METRICS = {"revenue", "ebit", "da", "gross_debt", "cash", "free_float_pct",
-           "audit_opinion", "going_concern"}
+           "excluded_holding_pct", "audit_opinion", "going_concern"}
 METHODS = {"pdftotext", "agent-read", "ocr"}
 
 
@@ -55,7 +61,8 @@ def _check(isin, f):
         raise ValueError(f"{isin}: unknown metric {f['metric']}")
     if f["method"] not in METHODS:
         raise ValueError(f"{isin}: unknown method {f['method']}")
-    if f["metric"] not in ("audit_opinion", "going_concern", "free_float_pct") and "year" not in f:
+    if f["metric"] not in ("audit_opinion", "going_concern", "free_float_pct",
+                           "excluded_holding_pct") and "year" not in f:
         raise ValueError(f"{isin}: {f['metric']} without fiscal year")
 
 
@@ -85,7 +92,7 @@ def _src(f):
 
 
 # Captions read line by line and added up (long-term + short-term debt).
-SUMMED = {"gross_debt"}
+SUMMED = {"gross_debt", "excluded_holding_pct"}
 
 
 def figures(entry):
@@ -132,6 +139,10 @@ def figures(entry):
         f = ff[max(ff, key=lambda k: k or 0)]
         out["free_float_pct"] = f["value"]
         out["sources"]["free_float"] = _src(f)
+    xh = by.get("excluded_holding_pct", {}).get(None)
+    if xh:
+        out["free_float_max_pct"] = round(100 - xh["value"], 2)
+        out["sources"]["free_float_max"] = xh["sources"]
     op = by.get("audit_opinion", {})
     if op:
         f = op[max(op, key=lambda k: k or 0)]

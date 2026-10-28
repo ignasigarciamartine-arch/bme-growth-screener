@@ -69,6 +69,9 @@ def inputs(lh, ex):
         out["free_float_pct"], src["free_float"] = lh["free_float_pct"], lh_page("free_float")
     else:
         out["free_float_pct"] = None
+    out["free_float_max_pct"] = ex.get("free_float_max_pct")
+    if out["free_float_pct"] is None and ex.get("free_float_max_pct") is not None:
+        src["free_float"] = ex["sources"]["free_float_max"]
     out["revenue_history"] = ex.get("revenue_history")
     out["year"] = year
     if ex.get("revenue_history"):
@@ -117,7 +120,13 @@ def evaluate(company, lh, filing, cfg, ex=None):
         notes["F5"] = round(nd / ebitda, 2)
         res["F5"] = PASS if notes["F5"] < F["F5"]["max_x"] else FAIL
 
-    res["F6"] = NEEDS if ff is None else (PASS if ff >= F["F6"]["min_pct"] else FAIL)
+    if ff is not None:
+        res["F6"] = PASS if ff >= F["F6"]["min_pct"] else FAIL
+    elif val["free_float_max_pct"] is not None and val["free_float_max_pct"] < F["F6"]["min_pct"]:
+        # Holders the definition excludes already leave less than the bar.
+        res["F6"], notes["F6"] = FAIL, f"at most {val['free_float_max_pct']}"
+    else:
+        res["F6"] = NEEDS
 
     # An opinion read on its page (data/extracted) overrides the text parse,
     # which cannot see reports printed as images.
@@ -140,7 +149,7 @@ def evaluate(company, lh, filing, cfg, ex=None):
         "isin": company["isin"], "name": company["name"],
         "market_cap_eur_m": round(m / 1e6, 1) if m else None,
         "revenue_eur_m": rev, "ebitda_eur_m": ebitda, "net_debt_eur_m": nd,
-        "nd_ebitda": notes.get("F5"), "free_float_pct": ff, "revenue_cagr_3y_pct": notes.get("F4"),
+        "nd_ebitda": notes.get("F5"), "free_float_pct": ff if ff is not None else notes.get("F6"), "revenue_cagr_3y_pct": notes.get("F4"),
         "fiscal_year": val["year"], "lighthouse_year": lh.get("actual_year"),
         "auditor": filing.get("auditor"), "audit_opinion": op,
         "going_concern": gc,
