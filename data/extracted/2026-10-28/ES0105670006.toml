@@ -1,0 +1,64 @@
+isin = "ES0105670006"
+name = "UMBRELLA GLOBAL"
+# Consolidated FY2025, 05670_OtraInfRelev_20260430.pdf. Audit report pages 3-4 are images: read through OCR
+# and checked by hand. Verdict on the opinion: CLEAN, Grant Thornton (Valencia), p3, no going-concern section.
+# The July FAIL came from a text regex that took the auditor's standard going-concern paragraph (p6) for a finding.
+# The case fails anyway on F3: EBITDA is negative.
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 27_594_957
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 11
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 15_252_281
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 11
+method = "pdftotext"
+note = "Consolidated P&L, 2024 comparative"
+
+[[figure]]
+metric = "ebit"
+year = 2025
+value = -6_085_151
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 11
+method = "pdftotext"
+note = "Resultado de explotacion"
+
+[[figure]]
+metric = "da"
+year = 2025
+value = 2_540_125
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 11
+method = "pdftotext"
+note = "Amortizacion del inmovilizado"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 3
+method = "ocr"
+note = "Grant Thornton, consolidated FY2025: 'En nuestra opinion, las cuentas anuales consolidadas adjuntas expresan, en todos los aspectos significativos, la imagen fiel'. Unmodified. Individual report (p112): also unmodified."
+
+[[figure]]
+metric = "going_concern"
+value = false
+scale = 1
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 3
+method = "ocr"
+note = "Opinion -> Fundamento -> Cuestiones clave (revenue recognition, p4); no material-uncertainty section. The going-concern wording on p6 is the auditor's standard responsibilities paragraph."
