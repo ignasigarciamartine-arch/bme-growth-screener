@@ -48,7 +48,9 @@ def _page_numbers(cache, file, page):
     if not pages or not 1 <= page <= len(pages):
         return None
     p = pages[page - 1]
+    # Spanish format (1.234.567,89), English format (1,234,567.89) and small integers.
     return [es_number(x) for x in NUM.findall(p)] + \
+        [float(x.replace(",", "")) for x in re.findall(r"(?<![\d.,])\d{1,3}(?:,\d{3})+(?:\.\d+)?", p)] + \
         [float(x) for x in re.findall(r"(?<![\d.,])\d{1,3}(?![\d.,])", p)]
 
 
