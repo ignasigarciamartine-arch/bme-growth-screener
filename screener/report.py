@@ -1,6 +1,8 @@
-"""Step 5: write the run to disk and print the funnel."""
+"""Step 5: write the run to disk (CSV, funnel.md, report.html) and print the funnel."""
 import csv
 import os
+
+from . import report_html
 
 
 def _csv(path, rows):
@@ -94,7 +96,8 @@ def pass_lines(screened):
     return out
 
 
-def write(out_dir, stages, screened, checks, cfg, figure_checks=(), ocr=False, notes=()):
+def write(out_dir, stages, screened, checks, cfg, figure_checks=(), ocr=False, notes=(),
+          docs=None, extracted=None, parsed=None):
     os.makedirs(out_dir, exist_ok=True)
     stage_rows = []
     for r in stages["listed"]:
@@ -126,4 +129,6 @@ def write(out_dir, stages, screened, checks, cfg, figure_checks=(), ocr=False, n
         md += ["", "## PASS: figures and sources", ""] + passes
     with open(os.path.join(out_dir, "funnel.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(md) + "\n")
+    report_html.write(out_dir, stages, screened, cfg, list(figure_checks), ocr, list(notes),
+                      docs, extracted, parsed, cfg["universe"]["as_of"])
     return lines

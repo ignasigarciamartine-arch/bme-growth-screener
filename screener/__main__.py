@@ -139,10 +139,11 @@ def run(args, log=print):
                   "  were not re-verified on this machine. They still count, with their page.",
                   "  " + pdf.TESSERACT_HINT]
     out = os.path.join(args.out, as_of.isoformat())
-    lines = report.write(out, stages, screened, checks, cfg, figure_checks, ocr_exe is not None, notes)
+    lines = report.write(out, stages, screened, checks, cfg, figure_checks, ocr_exe is not None, notes,
+                         docs=docs, extracted=ex, parsed=parsed)
     with open(os.path.join(out, "parsed.json"), "w", encoding="utf-8") as f:
         json.dump(parsed, f, ensure_ascii=False, indent=1)
-    log("[report] " + out)
+    log("[report] " + out + " (report.html, screened.csv, funnel.md)")
     log("")
     log("\n".join(lines))
     return screened
