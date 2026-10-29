@@ -115,3 +115,10 @@ file = "05804_OtraInfRelev_20260421_3.pdf"
 page = 65
 method = "pdftotext"
 note = "Opinion -> Fundamento -> Cuestiones clave on the same page; no material-uncertainty section"
+
+# Why a filter stays open (NEEDS_DATA), shown in the report.
+[open.F6]
+text = """Holders of 5% or more own 84.93% directly. Free float is about 26.7% if Inmoinvest ARH \
+(13.24%) has no board seat and about 13.4% if it has one. The board has five dominical directors and \
+the filings read do not say whom each one represents."""
+refs = ["05804_OtraInfRelev_20260706.pdf#1", "05804_OtraInfRelev_20260421_3.pdf#128"]

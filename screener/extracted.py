@@ -26,6 +26,16 @@ installed, and is reported as not re-verified when it is not.
 
 A figure that is not in this file is not invented: the filter stays NEEDS_DATA.
 
+Two optional tables feed the report (report_html.py) and never a verdict:
+
+    [open.F6]                     # why a filter stays NEEDS_DATA
+    text = "..."
+    refs = ["file.pdf#1"]
+
+    [[caveat]]                    # a weak point of a PASS
+    text = "clears the bar by {ff_margin:.1f} points"   # placeholders filled
+    refs = ["free_float_pct", "revenue:2022", "file.pdf#6"]  # from this run
+
 Definitions (fixed with the extraction, 2026-10-28):
   revenue          Importe neto de la cifra de negocios (consolidated if the
                    group reports consolidated accounts).
@@ -84,7 +94,8 @@ def load(root, as_of):
         for f in d.get("figure", []):
             _check(isin, f)
         out[isin] = {"name": d.get("name"), "status": d.get("status"),
-                     "figures": d.get("figure", []), "file": os.path.basename(path)}
+                     "figures": d.get("figure", []), "file": os.path.basename(path),
+                     "open": d.get("open", {}), "caveats": d.get("caveat", [])}
     return out
 
 

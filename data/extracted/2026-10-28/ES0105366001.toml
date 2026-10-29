@@ -119,3 +119,12 @@ file = "alq_20261012_1.pdf"
 page = 1
 method = "pdftotext"
 note = "Lighthouse 12-Oct-2026: M.A. Acebes 41.1, M. Acebes 17.9, M. Acebes 17.5, treasury 1.0, free float 22.4. Cross-check, holdings filing 05366_OtraInfRelev_20260706.pdf p1 (30-Jun-2026): Acebes family 76.57% (Sebeca Ikap 55.94 + direct 20.63); 100 - 76.57 - 1.0 = 22.43."
+
+# Caveats shown in the report. {placeholders} are filled from the figures of this run;
+# refs are "metric", "metric:year" or "file.pdf#page".
+[[caveat]]
+text = """EBITDA of EUR {ebitda:.2f}M includes EUR {da:.2f}M of depreciation ({da_pct:.0f}% of EBITDA), \
+mostly on the rental fleet, which has to be renewed to keep the revenue. F5 passes at {nd_ebitda:.2f}x \
+net debt to EBITDA; against the operating result (EUR {ebit:.2f}M) the same net debt is {nd_ebit:.1f}x. \
+Net debt includes EUR 125.6M of finance leases (59.6M long term, 66.0M short term)."""
+refs = ["da", "ebit", "gross_debt"]

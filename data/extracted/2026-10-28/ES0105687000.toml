@@ -119,3 +119,18 @@ file = "etc_20250331_1.pdf"
 page = 1
 method = "pdftotext"
 note = "Lighthouse 31-Mar-2025 (stale). Cross-check, holdings filing 05687_OtraInfRelev_20260710.pdf p1 (8-Jul-2026): holders of 5% or more A. Hernandez Poza 21.0, Erbienergia 13.7, A. Torrego 10.0, J. A. Martin 8.5 = 53.2%, so at most 46.8% before treasury and smaller director holdings."
+
+# Caveats shown in the report. {placeholders} are filled from the figures of this run;
+# refs are "metric", "metric:year" or "file.pdf#page".
+[[caveat]]
+text = """Most of the {cagr:.1f}% revenue CAGR is acquired. Revenue goes from EUR {rev[2022]:.2f}M in \
+FY2022 to EUR {rev[2023]:.2f}M in FY2023, the first year that consolidates Sarpel Ingeniería (from \
+3 March 2023) and Parque Eólico Valdelugo (from 15 January 2023). From FY2023 to FY2025 the CAGR is \
+{cagr_from[2023]:.1f}%; this report does not split organic growth within that span."""
+refs = ["revenue:2022", "revenue:2023", "05687_OtraInfRelev_20240314.pdf#6", "revenue:2025"]
+
+[[caveat]]
+text = """Free float of {ff:.1f}% comes from a Lighthouse sheet dated {ff_date}, {ff_age} months before \
+the universe date. The holdings filing of 8 July 2026 is consistent: holders of 5% or more own 53.2%, \
+which leaves at most 46.8%."""
+refs = ["free_float_pct", "05687_OtraInfRelev_20260710.pdf#1"]
