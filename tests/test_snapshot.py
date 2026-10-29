@@ -9,6 +9,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import tomllib
 
 import pytest
@@ -71,14 +72,48 @@ def _documents_cached():
                if k in d and d[k].get("status") == "OK")
 
 
-@pytest.mark.skipif(not _documents_cached(), reason="documents not in cache/ yet")
-def test_verdicts_from_the_cached_documents(tmp_path):
+@pytest.fixture(scope="module")
+def cached_run(tmp_path_factory):
+    """One offline run of the pipeline for the tests that need the documents."""
+    out = tmp_path_factory.mktemp("runs")
     args = argparse.Namespace(config=os.path.join(ROOT, "config", "criteria.toml"), as_of=AS_OF,
-                              cache=CACHE, out=str(tmp_path), offline=True,
+                              cache=CACHE, out=str(out), offline=True,
                               rebuild_snapshot=False, no_ocr=True)
-    screened = cli.run(args, log=lambda *a: None)
+    return cli.run(args, log=lambda *a: None), os.path.join(str(out), AS_OF)
+
+
+@pytest.mark.skipif(not _documents_cached(), reason="documents not in cache/ yet")
+def test_verdicts_from_the_cached_documents(cached_run):
+    screened, _ = cached_run
     by = {}
     for r in screened:
         by.setdefault(r["verdict"], set()).add(r["name"])
     assert {k: len(v) for k, v in by.items()} == {"FAIL": 21, "NEEDS_DATA": 10, "PASS": 4}
     assert by["PASS"] == PASS
+
+
+PASS_ISIN = {"ES0105366001": "Alquiber Quality", "ES0105687000": "Energy Solar Tech",
+             "ES0175589029": "Seresco", "ES0105618005": "Vytrus Biotech"}
+
+
+@pytest.mark.skipif(not _documents_cached(), reason="documents not in cache/ yet")
+def test_report_is_written_with_the_four_passes(cached_run):
+    _, out = cached_run
+    with open(os.path.join(out, "report.html"), encoding="utf-8") as fh:
+        html = fh.read()
+    # Self-contained: no external stylesheet or script, no CDN.
+    assert not re.search(r"<(link|script)\b", html, re.I)
+    # The 35 candidates in the matrix, each with its verdict.
+    assert html.count('<tr><th class="co" scope="row">') == 35
+    assert html.count('<span class="v pass">PASS</span>') == 4
+    assert html.count('<span class="v need">NEEDS DATA</span>') == 10
+    assert html.count('<span class="v fail">FAIL</span>') == 21
+    # One card per PASS, with figures linked to their PDF page.
+    for isin, name in PASS_ISIN.items():
+        i = html.index(f'<article class="card" id="{isin}">')
+        card = html[i:html.index("</article>", i)]
+        assert name in card
+        assert "#page=" in card and "documented" in card
+    assert "not investment advice" in html.lower()
+    assert "<!-- CV link -->" in html
+    assert "inveready" not in html.lower()
