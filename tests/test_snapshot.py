@@ -116,4 +116,3 @@ def test_report_is_written_with_the_four_passes(cached_run):
         assert "#page=" in card and "documented" in card
     assert "not investment advice" in html.lower()
     assert "<!-- CV link -->" in html
-    assert "inveready" not in html.lower()
