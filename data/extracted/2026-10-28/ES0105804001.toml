@@ -2,7 +2,7 @@ isin = "ES0105804001"
 name = "NZI HELMETS"
 # Consolidated accounts FY2025 (05804_OtraInfRelev_20260421_3.pdf, group pages 65-75; consolidated revenue
 # equals the parent's, p12). FY2023: parent's abbreviated accounts only (05804_OtraInfRelev_20240627.pdf), listed in 2024.
-# F6 LEFT OPEN (no free_float_pct entered): holdings filing 05804_OtraInfRelev_20260706.pdf p1 gives direct holdings
+# C4 LEFT OPEN (no free_float_pct entered): holdings filing 05804_OtraInfRelev_20260706.pdf p1 gives direct holdings
 # of 5%+ = 84.93% (Prendas Deportivas NZI 39.49, Inmoinvest ARH 13.24, Squad Global Trend 11.85, Aniresol 11.85,
 # Papapear 8.50); treasury cost 259,843 EUR (~1.6% at ~1 EUR/share, accounts p44). Free float is ~26.7% if
 # Inmoinvest ARH has no board seat and ~13.4% if it has one: the board (p128) has five dominical directors and the
@@ -49,56 +49,6 @@ method = "agent-read"
 note = "Parent's abbreviated P&L FY2023, 2022 comparative (restated, marked *)"
 
 [[figure]]
-metric = "ebit"
-year = 2025
-value = 237_738
-scale = 1
-file = "05804_OtraInfRelev_20260421_3.pdf"
-page = 74
-method = "pdftotext"
-note = "Resultado de explotacion"
-
-[[figure]]
-metric = "da"
-year = 2025
-value = 222_536
-scale = 1
-file = "05804_OtraInfRelev_20260421_3.pdf"
-page = 74
-method = "pdftotext"
-note = "Amortizacion del inmovilizado"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 245_327
-scale = 1
-file = "05804_OtraInfRelev_20260421_3.pdf"
-page = 73
-method = "pdftotext"
-note = "Deudas a largo plazo"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 130_139
-scale = 1
-file = "05804_OtraInfRelev_20260421_3.pdf"
-page = 73
-method = "pdftotext"
-note = "Deudas a corto plazo"
-
-[[figure]]
-metric = "cash"
-year = 2025
-value = 1_427_978
-scale = 1
-file = "05804_OtraInfRelev_20260421_3.pdf"
-page = 73
-method = "pdftotext"
-note = "Efectivo y otros activos liquidos equivalentes"
-
-[[figure]]
 metric = "audit_opinion"
 value = "CLEAN"
 scale = 1
@@ -117,8 +67,8 @@ method = "pdftotext"
 note = "Opinion -> Fundamento -> Cuestiones clave on the same page; no material-uncertainty section"
 
 # Why a filter stays open (NEEDS_DATA), shown in the report.
-[open.F6]
-text = """Holders of 5% or more own 84.93% directly. Free float is about 26.7% if Inmoinvest ARH \
+[open.C4]
+text = """Who holds what for the founders and directors is not stated. Holders of 5% or more own 84.93% directly. Free float is about 26.7% if Inmoinvest ARH \
 (13.24%) has no board seat and about 13.4% if it has one. The board has five dominical directors and \
 the filings read do not say whom each one represents."""
 refs = ["05804_OtraInfRelev_20260706.pdf#1", "05804_OtraInfRelev_20260421_3.pdf#128"]

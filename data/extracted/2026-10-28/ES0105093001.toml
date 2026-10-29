@@ -1,0 +1,58 @@
+isin = "ES0105093001"
+name = "GIGAS HOSTING"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05093_OtraInfRelev_20260408.pdf"
+page = 10
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "05093_OtraInfRelev_20260408.pdf"
+page = 10
+method = "ocr"
+note = "EY; no going-concern section, key audit matters follow on p11"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 74367801
+scale = 1
+file = "05093_OtraInfRelev_20260408.pdf"
+page = 20
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 76509840
+scale = 1
+file = "05093_OtraInfRelev_20260408.pdf"
+page = 20
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 66721029
+scale = 1
+file = "05093_OtraInfRelev_20240410.pdf"
+page = 25
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 61434378
+scale = 1
+file = "05093_OtraInfRelev_20240410.pdf"
+page = 25
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"

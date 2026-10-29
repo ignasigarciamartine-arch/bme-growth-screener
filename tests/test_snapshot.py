@@ -21,7 +21,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AS_OF = "2026-10-28"
 SNAP = os.path.join(ROOT, "data", "snapshots", AS_OF)
 CACHE = os.path.join(ROOT, "cache")
-PASS = {"SERESCO", "ALQUIBER QUALITY", "ENERGY SOLAR TECH", "VYTRUS BIOTECH"}
 
 
 def cfg():
@@ -41,24 +40,24 @@ def test_funnel_counts():
     assert len(s["listed"]) == 109
     assert len(s["excluded_subsector"]) == 54
     assert len(s["operating"]) == 55
-    assert len(s["outside_band"]) == 16
-    assert len(s["in_band"]) == 39
-    assert len(s["excluded_isin"]) == 4
-    assert len(s["candidates"]) == 35
+    assert len(s["outside_band"]) == 20
+    assert len(s["in_band"]) == 35
+    assert len(s["excluded_isin"]) == 1
+    assert len(s["candidates"]) == 34
 
 
 def test_snapshot_lists_documents_for_every_candidate():
     with open(os.path.join(SNAP, "documents.json"), encoding="utf-8") as fh:
         docs = json.load(fh)
     cands = {c["isin"] for c in screen.funnel(universe(), cfg())["candidates"]}
-    assert set(docs) == cands
+    assert cands <= set(docs)                    # the snapshot may also hold earlier candidates
 
 
 def test_documented_readings_load_and_cite_file_and_page():
     ex = extracted.load(ROOT, AS_OF)
-    assert len(ex) == 13
+    assert len(ex) == 29
     for isin, e in ex.items():
-        for f in e["figures"]:
+        for f in e["figures"] + e["judgements"]:
             assert f["file"].endswith(".pdf") and f["page"] >= 1, (isin, f)
 
 
@@ -84,35 +83,28 @@ def cached_run(tmp_path_factory):
 
 @pytest.mark.skipif(not _documents_cached(), reason="documents not in cache/ yet")
 def test_verdicts_from_the_cached_documents(cached_run):
-    screened, _ = cached_run
+    screened, out = cached_run
     by = {}
     for r in screened:
         by.setdefault(r["verdict"], set()).add(r["name"])
-    assert {k: len(v) for k, v in by.items()} == {"FAIL": 21, "NEEDS_DATA": 10, "PASS": 4}
-    assert by["PASS"] == PASS
-
-
-PASS_ISIN = {"ES0105366001": "Alquiber Quality", "ES0105687000": "Energy Solar Tech",
-             "ES0175589029": "Seresco", "ES0105618005": "Vytrus Biotech"}
+    assert {k: len(v) for k, v in by.items()} == {"FAIL": 33, "PASS": 1}
+    assert by["PASS"] == {"CUATROOCHENTA"}
+    # Nothing left for the agents to read or judge.
+    with open(os.path.join(out, "todo.csv"), encoding="utf-8") as fh:
+        assert list(csv.DictReader(fh)) == []
 
 
 @pytest.mark.skipif(not _documents_cached(), reason="documents not in cache/ yet")
-def test_report_is_written_with_the_four_passes(cached_run):
+def test_report_is_written(cached_run):
     _, out = cached_run
     with open(os.path.join(out, "report.html"), encoding="utf-8") as fh:
         html = fh.read()
     # Self-contained: no external stylesheet or script, no CDN.
-    assert not re.search(r"<(link|script)\b", html, re.I)
-    # The 35 candidates in the matrix, each with its verdict.
-    assert html.count('<tr><th class="co" scope="row">') == 35
-    assert html.count('<span class="v pass">PASS</span>') == 4
-    assert html.count('<span class="v need">NEEDS DATA</span>') == 10
-    assert html.count('<span class="v fail">FAIL</span>') == 21
-    # One card per PASS, with figures linked to their PDF page.
-    for isin, name in PASS_ISIN.items():
-        i = html.index(f'<article class="card" id="{isin}">')
-        card = html[i:html.index("</article>", i)]
-        assert name in card
-        assert "#page=" in card and "documented" in card
+    assert not re.search(r"<(link|script)", html, re.I)
+    assert html.count("<span class='v FAIL'>FAIL</span>") == 33
+    assert html.count("<span class='v PASS'>PASS</span>") == 1
+    i = html.index('<article class="card" id="ES0105509006">')
+    card = html[i:html.index("</article>", i)]
+    assert "#page=" in card and "Guidance 2030" in card
     assert "not investment advice" in html.lower()
     assert "<!-- CV link -->" in html

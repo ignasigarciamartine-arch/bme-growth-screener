@@ -3,7 +3,7 @@ name = "UMBRELLA GLOBAL"
 # Consolidated FY2025, 05670_OtraInfRelev_20260430.pdf. Audit report pages 3-4 are images: read through OCR
 # and checked by hand. Verdict on the opinion: CLEAN, Grant Thornton (Valencia), p3, no going-concern section.
 # The July FAIL came from a text regex that took the auditor's standard going-concern paragraph (p6) for a finding.
-# The case fails anyway on F3: EBITDA is negative.
+# The case fails on C2 (judgement below).
 
 [[figure]]
 metric = "revenue"
@@ -26,26 +26,6 @@ method = "pdftotext"
 note = "Consolidated P&L, 2024 comparative"
 
 [[figure]]
-metric = "ebit"
-year = 2025
-value = -6_085_151
-scale = 1
-file = "05670_OtraInfRelev_20260430.pdf"
-page = 11
-method = "pdftotext"
-note = "Resultado de explotacion"
-
-[[figure]]
-metric = "da"
-year = 2025
-value = 2_540_125
-scale = 1
-file = "05670_OtraInfRelev_20260430.pdf"
-page = 11
-method = "pdftotext"
-note = "Amortizacion del inmovilizado"
-
-[[figure]]
 metric = "audit_opinion"
 value = "CLEAN"
 scale = 1
@@ -62,3 +42,11 @@ file = "05670_OtraInfRelev_20260430.pdf"
 page = 3
 method = "ocr"
 note = "Opinion -> Fundamento -> Cuestiones clave (revenue recognition, p4); no material-uncertainty section. The going-concern wording on p6 is the auditor's standard responsibilities paragraph."
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Distributes solar equipment (panels, inverters, batteries) and builds and runs solar projects. Distribution and construction, not a technology product."
+file = "05670_OtraInfRelev_20260430.pdf"
+page = 15
+method = "agent-read"

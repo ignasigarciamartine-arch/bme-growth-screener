@@ -1,17 +1,17 @@
-"""Step 3: the funnel and the hard filters.
+"""Step 3: the funnel and the filters C1-C7 (config/criteria.toml).
 
 Rule for every filter: if it cannot be evaluated the result is NEEDS_DATA,
 never PASS. Missing data is not favourable data.
 """
-PASS, FAIL, NEEDS, NA, MANUAL = "PASS", "FAIL", "NEEDS_DATA", "N/A", "MANUAL"
+PASS, FAIL, NEEDS = "PASS", "FAIL", "NEEDS_DATA"
 
 
 def funnel(universe, cfg):
-    """Universe -> operating -> inside the F1 band -> candidates."""
+    """Universe -> operating -> inside the C1 band -> candidates."""
     u = cfg["universe"]
     sub = {(x["sector"], x["subsector"]): x["reason"] for x in u.get("exclude_subsector", [])}
     by_isin = {x["isin"]: x["reason"] for x in u.get("exclude_isin", [])}
-    f1 = cfg["filters"]["F1"]
+    f1 = cfg["filters"]["C1"]
 
     stages = {"listed": universe}
     stages["excluded_subsector"] = [r for r in universe if (r["sector"], r["subsector"]) in sub]
@@ -24,7 +24,7 @@ def funnel(universe, cfg):
 
     stages["outside_band"] = [r for r in operating
                               if mcap(r) is not None and not f1["min_eur"] <= mcap(r) <= f1["max_eur"]]
-    # A company without a market cap is not dropped: F1 stays NEEDS_DATA.
+    # A company without a market cap is not dropped: C1 stays NEEDS_DATA.
     in_band = [r for r in operating if mcap(r) is None or f1["min_eur"] <= mcap(r) <= f1["max_eur"]]
     stages["in_band"] = in_band
     stages["excluded_isin"] = [dict(r, reason=by_isin[r["isin"]]) for r in in_band if r["isin"] in by_isin]
@@ -48,7 +48,7 @@ def _fmt(src):
 
 
 def inputs(lh, ex):
-    """F2-F6 inputs and where each comes from.
+    """Financial inputs and where each comes from.
 
     Figures read from the accounts (data/extracted) come first: the accounts are
     the primary source. The Lighthouse sheet fills a gap only when its actual
@@ -61,15 +61,12 @@ def inputs(lh, ex):
     year = ex.get("year")
     lh_same_year = year is None or str(lh.get("actual_year") or "").startswith(str(year))
     out, src = {}, {}
-    for key, lh_key, row in (("revenue_m", "revenue_m", "revenue"), ("ebitda_m", "ebitda_m", "ebitda"),
-                             ("net_debt_m", "net_debt_m", "net_debt")):
-        name = row
-        if ex.get(key) is not None:
-            out[key], src[name] = ex[key], ex["sources"][name]
-        elif lh_same_year and lh.get(lh_key) is not None:
-            out[key], src[name] = lh[lh_key], lh_page(row)
-        else:
-            out[key] = None
+    if ex.get("revenue_m") is not None:
+        out["revenue_m"], src["revenue"] = ex["revenue_m"], ex["sources"]["revenue"]
+    elif lh_same_year and lh.get("revenue_m") is not None:
+        out["revenue_m"], src["revenue"] = lh["revenue_m"], lh_page("revenue")
+    else:
+        out["revenue_m"] = None
     if ex.get("free_float_pct") is not None:
         out["free_float_pct"], src["free_float"] = ex["free_float_pct"], ex["sources"]["free_float"]
     elif lh.get("free_float_pct") is not None:
@@ -86,87 +83,135 @@ def inputs(lh, ex):
     return out, src
 
 
+def _cagr(val, n):
+    """Revenue CAGR over n years, from years+1 consecutive audited figures that
+    end in the latest audited year; None when the series is not complete.
+    Lighthouse shows one actual year plus estimates, so the series comes from
+    the accounts (data/extracted)."""
+    hist = val["revenue_history"]               # {year: revenue_m}, actuals only
+    ys = sorted(hist)[-(n + 1):] if hist else []
+    if len(ys) == n + 1 and ys[-1] - ys[0] == n and ys[-1] == val["year"] and hist[ys[0]] > 0:
+        return round(((hist[ys[-1]] / hist[ys[0]]) ** (1 / n) - 1) * 100, 1)
+    return None
+
+
 def evaluate(company, lh, filing, cfg, ex=None):
     F = cfg["filters"]
     res, notes = {}, {}
     val, src = inputs(lh, ex)
     ex = ex or {}
+    judged = ex.get("judgements", {})
 
     m = company.get("market_cap_eur")
     m = float(m) if m not in (None, "") else None
-    res["F1"] = NEEDS if m is None else (PASS if F["F1"]["min_eur"] <= m <= F["F1"]["max_eur"] else FAIL)
+    res["C1"] = NEEDS if m is None else (PASS if F["C1"]["min_eur"] <= m <= F["C1"]["max_eur"] else FAIL)
 
-    rev, ebitda = val["revenue_m"], val["ebitda_m"]
-    nd, ff = val["net_debt_m"], val["free_float_pct"]
-
-    res["F2"] = NEEDS if rev is None else (PASS if rev >= F["F2"]["min_eur_m"] else FAIL)
-    res["F3"] = NEEDS if ebitda is None else (PASS if ebitda > 0 else FAIL)
-
-    # F4 needs years+1 audited revenue figures, consecutive and ending in the
-    # latest audited year. Lighthouse shows one actual year plus estimates, so
-    # the series comes from the accounts (data/extracted) or stays open.
-    hist = val["revenue_history"]               # {year: revenue_m}, actuals only
-    n = F["F4"]["years"]
-    ys = sorted(hist)[-(n + 1):] if hist else []
-    if len(ys) == n + 1 and ys[-1] - ys[0] == n and ys[-1] == val["year"]:
-        cagr = ((hist[ys[-1]] / hist[ys[0]]) ** (1 / n) - 1) * 100 if hist[ys[0]] > 0 else None
-        res["F4"] = NEEDS if cagr is None else (PASS if cagr > F["F4"]["min_pct"] else FAIL)
-        notes["F4"] = None if cagr is None else round(cagr, 1)
+    # C2: the sector decides; outside it, only a documented judgement can pass.
+    if company.get("sector") in F["C2"]["sectors"]:
+        res["C2"], notes["C2"] = PASS, "sector " + company["sector"]
+    elif "C2" in judged:
+        res["C2"], notes["C2"] = judged["C2"]["verdict"], "judged"
     else:
-        res["F4"] = NEEDS
+        res["C2"], notes["C2"] = FAIL, "sector " + str(company.get("sector"))
 
-    if nd is None:
-        res["F5"] = NEEDS
-    elif nd < 0:
-        res["F5"], notes["F5"] = PASS, 0.0                   # net cash
-    elif ebitda is None:
-        res["F5"] = NEEDS
-    elif ebitda <= 0:
-        res["F5"] = NA                                        # ratio meaningless; F3 already fails
-    else:
-        notes["F5"] = round(nd / ebitda, 2)
-        res["F5"] = PASS if notes["F5"] < F["F5"]["max_x"] else FAIL
+    cagr = _cagr(val, F["C3"]["years"])
+    res["C3"] = NEEDS if cagr is None else (PASS if cagr >= F["C3"]["min_pct"] else FAIL)
 
-    if ff is not None:
-        res["F6"] = PASS if ff >= F["F6"]["min_pct"] else FAIL
-    elif val["free_float_max_pct"] is not None and val["free_float_max_pct"] < F["F6"]["min_pct"]:
-        # Holders the definition excludes already leave less than the bar.
-        res["F6"], notes["F6"] = FAIL, f"at most {val['free_float_max_pct']}"
+    # C4: insider holdings are a lower bound (only listed holders are added);
+    # a strict free float gives an upper bound (insiders <= 100 - free float).
+    bar = F["C4"]["min_pct"]
+    ins, ff = ex.get("insider_pct"), ex.get("free_float_pct")
+    if ins is not None and ins >= bar:
+        res["C4"] = PASS
+    elif ff is not None and 100 - ff < bar:
+        res["C4"], notes["C4"] = FAIL, f"at most {round(100 - ff, 1)} (free float {ff})"
+    elif ins is not None and ex.get("holders_complete"):
+        res["C4"] = FAIL
     else:
-        res["F6"] = NEEDS
+        res["C4"] = NEEDS
+
+    intl = ex.get("intl_pct")
+    res["C5"] = NEEDS if intl is None else (PASS if intl >= F["C5"]["min_pct"] else FAIL)
+
+    res["C6"] = judged["C6"]["verdict"] if "C6" in judged else NEEDS
 
     # An opinion read on its page (data/extracted) overrides the text parse,
     # which cannot see reports printed as images.
     op = ex.get("opinion", filing.get("opinion"))
     gc = ex.get("going_concern", filing.get("going_concern"))
     src["opinion"] = ex["sources"].get("opinion") if "opinion" in ex else (
-        {"file": filing.get("file"), "page": "-", "method": "text-layer regex"} if op else None)
+        {"file": filing.get("file"), "page": "-", "method": "text-layer regex"} if op or gc else None)
     if op in ("QUALIFIED", "ADVERSE", "DISCLAIMER") or gc:
-        res["F7"] = FAIL
+        res["C7"] = FAIL
     elif op == "CLEAN":
-        res["F7"] = PASS
+        res["C7"] = PASS
     else:
-        res["F7"] = NEEDS                                     # opinion not read
+        res["C7"] = NEEDS                                     # opinion not read
 
-    res["F8"] = MANUAL
-
-    auto = [res[k] for k in ("F1", "F2", "F3", "F4", "F5", "F6", "F7")]
-    verdict = FAIL if FAIL in auto else NEEDS if NEEDS in auto else PASS
+    verdict = FAIL if FAIL in res.values() else NEEDS if NEEDS in res.values() else PASS
+    exs = ex.get("sources", {})
     return {
-        "isin": company["isin"], "name": company["name"],
+        "isin": company["isin"], "name": company["name"], "sector": company.get("sector"),
         "market_cap_eur_m": round(m / 1e6, 1) if m else None,
-        "revenue_eur_m": rev, "ebitda_eur_m": ebitda, "net_debt_eur_m": nd,
-        "nd_ebitda": notes.get("F5"), "free_float_pct": ff if ff is not None else notes.get("F6"), "revenue_cagr_3y_pct": notes.get("F4"),
+        "revenue_eur_m": val["revenue_m"], "revenue_cagr_3y_pct": cagr,
+        "insider_pct": ins, "free_float_pct": ff, "intl_revenue_pct": intl,
         "fiscal_year": val["year"], "lighthouse_year": lh.get("actual_year"),
-        "auditor": filing.get("auditor"), "audit_opinion": op,
-        "going_concern": gc,
+        "auditor": filing.get("auditor"), "audit_opinion": op, "going_concern": gc,
         "restatement_declared": filing.get("restatement_declared"),
         **res, "verdict": verdict,
         "fails": ";".join(k for k, v in res.items() if v == FAIL),
         "needs_data": ";".join(k for k, v in res.items() if v == NEEDS),
-        "src_revenue": _fmt(src.get("revenue")), "src_ebitda": _fmt(src.get("ebitda")),
-        "src_net_debt": _fmt(src.get("net_debt")), "src_free_float": _fmt(src.get("free_float")),
+        "note_C2": notes.get("C2"), "note_C4": notes.get("C4"),
+        "judgement_C2": judged.get("C2", {}).get("text"),
+        "judgement_C6": judged.get("C6", {}).get("text"),
+        "src_revenue": _fmt(src.get("revenue")),
         "src_revenue_history": "; ".join(f"{y}: {_fmt(v)}" for y, v in
                                          sorted((src.get("revenue_history") or {}).items())) or None,
+        "src_insider": _fmt(exs.get("insider")), "src_free_float": _fmt(src.get("free_float")),
+        "src_intl": _fmt(exs.get("intl")),
+        "src_judgement_C2": _fmt(exs.get("judgement_C2")),
+        "src_judgement_C6": _fmt(exs.get("judgement_C6")),
         "src_opinion": _fmt(src.get("opinion")),
     }
+
+
+# What an agent has to read or judge for each open filter.
+TASKS = {
+    "C2": ("filter", "sector is not 06: read the activity note and judge whether technology is "
+                     "the product ([[judgement]] filter = \"C2\")"),
+    "C3": ("reader", "read revenue for the last audited year and the three before "
+                     "([[figure]] metric = \"revenue\", one per year)"),
+    "C4": ("shareholders", "read every founder, director and manager holding "
+                           "([[figure]] metric = \"insider_holding_pct\"; holders_complete = true "
+                           "when the list is complete)"),
+    "C5": ("reader", "read revenue outside Spain from the segment note "
+                     "([[figure]] metric = \"intl_revenue_pct\")"),
+    "C6": ("filter", "look for a published growth plan or guidance with quantified, dated targets "
+                     "([[judgement]] filter = \"C6\")"),
+    "C7": ("reader", "read the audit opinion and the going-concern section "
+                     "([[figure]] metric = \"audit_opinion\" and \"going_concern\")"),
+}
+# Cheapest first: an agent stops reading a company at its first FAIL.
+ORDER = ("C2", "C7", "C3", "C4", "C5", "C6")
+
+
+def todo(screened, readable=None, closed=None):
+    """The agents' work queue: for each company still open, the next filter to
+    read or judge. A company with a FAIL needs nothing more, and neither does
+    one without accounts to read (`readable`: ISINs whose filing is in hand).
+    `closed` ({isin: {filter}}) holds the filters an agent has already written
+    up as not readable ([open.Cn] in data/extracted): they are not asked again."""
+    out = []
+    for r in screened:
+        if readable is not None and r["isin"] not in readable:
+            continue
+        done = (closed or {}).get(r["isin"], set())
+        if r["verdict"] == FAIL and not (r["fails"] == "C2" and r.get("note_C2", "").startswith("sector")):
+            continue
+        open_ = [k for k in ORDER if k not in done and (r[k] == NEEDS or (
+            k == "C2" and r[k] == FAIL and str(r.get("note_C2")).startswith("sector")))]
+        if open_:
+            agent, task = TASKS[open_[0]]
+            out.append({"isin": r["isin"], "name": r["name"], "filter": open_[0],
+                        "agent": agent, "task": task, "open": ";".join(open_)})
+    return out

@@ -1,0 +1,10 @@
+isin = "ES0105425005"
+name = "KOMPUESTOS"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Spanish chemical company making mineral-filler concentrates and masterbatches for the plastics industry. Industrial chemistry, not a technology product."
+file = "kom_20261027_1.pdf"
+page = 1
+method = "agent-read"

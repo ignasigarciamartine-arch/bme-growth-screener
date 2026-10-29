@@ -1,0 +1,19 @@
+isin = "ES0105709002"
+name = "GREENING GROUP"
+# FY2025 pack 05709_OtraInfRelev_20260430_1.pdf: the auditor's reports are scanned pages, read through OCR.
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05709_OtraInfRelev_20260430_1.pdf"
+page = 85
+method = "ocr"
+note = "Deloitte, consolidated FY2025: unmodified opinion ('la imagen fiel'). Individual report, p15: also unmodified."
+
+[[figure]]
+metric = "going_concern"
+value = true
+file = "05709_OtraInfRelev_20260430_1.pdf"
+page = 86
+method = "ocr"
+note = "Consolidated FY2025: section 'Incertidumbre material relacionada con la Empresa en funcionamiento' (note 3.6: net losses of EUR 11M). Individual report, p16: same section."

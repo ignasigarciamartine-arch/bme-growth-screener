@@ -1,0 +1,26 @@
+isin = "ES0156303002"
+name = "1NKEMIA IUCT GROUP"
+
+[[judgement]]
+filter = "C2"
+verdict = "PASS"
+text = "A group built on its own chemistry and biotech technologies: spin-offs of its own technologies and stakes in technology start-ups. Technology is the product, though the group has been restructuring since 2019."
+file = "56303_OtraInfRelev_20250528_1.pdf"
+page = 4
+method = "agent-read"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "56303_OtraInfRelev_20250528_1.pdf"
+page = 7
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = true
+file = "56303_OtraInfRelev_20250528_1.pdf"
+page = 8
+method = "ocr"
+note = "FY2024. Emphasis paragraph: material uncertainty on going concern, negative equity of EUR -6.9M"

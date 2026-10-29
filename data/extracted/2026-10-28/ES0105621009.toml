@@ -1,0 +1,20 @@
+isin = "ES0105621009"
+name = "SOLARPROFIT"
+# Latest audited pack in the snapshot: FY2024, 05621_OtraInfRelev_20250530.pdf. The auditor's
+# report is scanned, read through OCR. The auditor is BDO (p9); the text parse names another firm.
+
+[[figure]]
+metric = "audit_opinion"
+value = "QUALIFIED"
+file = "05621_OtraInfRelev_20250530.pdf"
+page = 9
+method = "ocr"
+note = "BDO, consolidated FY2024: 'Opinion con salvedades'. Basis on p9-10: fixed assets not impaired despite signs of impairment, inventories held by third parties not confirmed (EUR 542,900) and restructured trade payables not verified (EUR 619,990)."
+
+[[figure]]
+metric = "going_concern"
+value = true
+file = "05621_OtraInfRelev_20250530.pdf"
+page = 10
+method = "ocr"
+note = "Consolidated FY2024: section 'Incertidumbre material relacionada con la Empresa en funcionamiento' (note 2.c: operating losses since 2023; pre-insolvency filing and court-approved restructuring plan, continued on p11)."

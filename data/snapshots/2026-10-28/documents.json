@@ -1500,5 +1500,249 @@
   "lighthouse": {
    "status": "NO_COVERAGE"
   }
+ },
+ "ES0105093001": {
+  "name": "GIGAS HOSTING",
+  "filing": {
+   "status": "OK",
+   "n_docs": 3,
+   "title": "Informacion Financiera del ejercicio 2025",
+   "year": 2025,
+   "date": "20260408",
+   "size": "18 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/04/05093_OtraInfRelev_20260408.pdf",
+   "file": "05093_OtraInfRelev_20260408.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Informacion financiera del ejercicio 2024",
+    "Informacion Financiera del ejercicio 2023"
+   ]
+  },
+  "filing_prior": {
+   "status": "OK",
+   "n_docs": 1,
+   "title": "Informacion Financiera del ejercicio 2023",
+   "year": 2023,
+   "date": "20240410",
+   "size": "22 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2024/04/05093_OtraInfRelev_20240410.pdf",
+   "file": "05093_OtraInfRelev_20240410.pdf",
+   "restatement_declared": false,
+   "alternatives": []
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 18,
+   "title": "Comunicacion de participaciones significativas a 30 de Junio 2026",
+   "date": "20260702",
+   "size": "92 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/07/05093_OtraInfRelev_20260701.pdf",
+   "file": "05093_OtraInfRelev_20260701.pdf"
+  },
+  "lighthouse": {
+   "status": "NO_COVERAGE"
+  }
+ },
+ "ES0105227013": {
+  "name": "ELZINC",
+  "filing": {
+   "status": "OK",
+   "n_docs": 4,
+   "title": "Informe de auditoria, junto con las cuentas anuales e informe de gestion, correspondiente al ejercicio finalizado el 31.12.2025",
+   "year": 2025,
+   "date": "20260430",
+   "size": "7 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/04/05227_OtraInfRelev_20260430.pdf",
+   "file": "05227_OtraInfRelev_20260430.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Informe de auditoria, junto con las cuentas anuales e informe de gestion, corres",
+    "Cuentas Anuales Auditadas del ejercicio anual terminado el 31 de diciembre de 20",
+    "Audited Annual Accounts for the year ended December 31, 2023"
+   ]
+  },
+  "filing_prior": {
+   "status": "OK",
+   "n_docs": 2,
+   "title": "Cuentas Anuales Auditadas del ejercicio anual terminado el 31 de diciembre de 2023",
+   "year": 2023,
+   "date": "20240423",
+   "size": "8 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2024/04/05227_OtraInfRelev_20240423.pdf",
+   "file": "05227_OtraInfRelev_20240423.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Audited Annual Accounts for the year ended December 31, 2023"
+   ]
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 21,
+   "title": "Participaciones significativas a 30 de junio de 2026",
+   "date": "20260710",
+   "size": "256 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/07/05227_OtraInfRelev_20260710.pdf",
+   "file": "05227_OtraInfRelev_20260710.pdf"
+  },
+  "lighthouse": {
+   "status": "NO_COVERAGE"
+  }
+ },
+ "ES0105621009": {
+  "name": "SOLARPROFIT",
+  "filing": {
+   "status": "OK",
+   "n_docs": 3,
+   "title": "Informe de Auditoria y Cuentas Anuales consolidadas 2024",
+   "year": 2024,
+   "date": "20250530",
+   "size": "43 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2025/05/05621_OtraInfRelev_20250530.pdf",
+   "file": "05621_OtraInfRelev_20250530.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Cuentas anuales independientes y consolidadas correspondientes al ejercicio 2023",
+    "Reformulacion Cuentas Anuales 2023"
+   ]
+  },
+  "filing_prior": {
+   "status": "NO_DOC",
+   "n_docs": 0
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 10,
+   "title": "Participaciones significativas Profithol SA a 30 de junio de 2026",
+   "date": "20260707",
+   "size": "51 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/07/05621_OtraInfRelev_20260707.pdf",
+   "file": "05621_OtraInfRelev_20260707.pdf"
+  },
+  "lighthouse": {
+   "status": "NO_COVERAGE"
+  }
+ },
+ "ES0105637005": {
+  "name": "HANNUN",
+  "filing": {
+   "status": "OK",
+   "n_docs": 3,
+   "title": "INFORMACION FINANCIERA ANUAL 2025",
+   "year": 2025,
+   "date": "20260429",
+   "size": "3 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/04/05637_OtraInfRelev_20260429.pdf",
+   "file": "05637_OtraInfRelev_20260429.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "INFORMACIONN FINANCIERA ANUAL 2024",
+    "INFORMACION FINANCIERA ANUAL 2023"
+   ]
+  },
+  "filing_prior": {
+   "status": "OK",
+   "n_docs": 1,
+   "title": "INFORMACION FINANCIERA ANUAL 2023",
+   "year": 2023,
+   "date": "20240422",
+   "size": "5 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2024/04/05637_OtraInfRelev_20240422_1.pdf",
+   "file": "05637_OtraInfRelev_20240422_1.pdf",
+   "restatement_declared": false,
+   "alternatives": []
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 11,
+   "title": "Participaciones significativas a 30.06.2026",
+   "date": "20260707",
+   "size": "90 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/07/05637_OtraInfRelev_20260707.pdf",
+   "file": "05637_OtraInfRelev_20260707.pdf"
+  },
+  "lighthouse": {
+   "status": "NO_COVERAGE"
+  }
+ },
+ "ES0105650008": {
+  "name": "SUBSTRATE ARTIFICIAL",
+  "filing": {
+   "status": "OK",
+   "n_docs": 3,
+   "title": "Informacion financiera ejercicio 2025",
+   "year": 2025,
+   "date": "20260430",
+   "size": "7 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/04/05650_OtraInfRelev_20260430.pdf",
+   "file": "05650_OtraInfRelev_20260430.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Informacion financiera anual del ejercicio 2023",
+    "Informacion financiera ejercicio 2024"
+   ]
+  },
+  "filing_prior": {
+   "status": "OK",
+   "n_docs": 1,
+   "title": "Informacion financiera anual del ejercicio 2023",
+   "year": 2023,
+   "date": "20240430",
+   "size": "9 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2024/04/05650_OtraInfRelev_20240429.pdf",
+   "file": "05650_OtraInfRelev_20240429.pdf",
+   "restatement_declared": false,
+   "alternatives": []
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 19,
+   "title": "Participaciones significativas a 30 de junio de 2026",
+   "date": "20260710",
+   "size": "77 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/07/05650_OtraInfRelev_20260710.pdf",
+   "file": "05650_OtraInfRelev_20260710.pdf"
+  },
+  "lighthouse": {
+   "status": "OK",
+   "lh_name": "Substrate Artificial Intelligence",
+   "date": "17/07/2026",
+   "url": "https://institutodeanalistas.com/wp-content/uploads/sai_20260717_1.pdf",
+   "file": "sai_20260717_1.pdf",
+   "n_reports": 14
+  }
+ },
+ "ES0156303002": {
+  "name": "1NKEMIA IUCT GROUP",
+  "filing": {
+   "status": "OK",
+   "n_docs": 3,
+   "title": "Informes financieros anuales individuales 2024",
+   "year": 2024,
+   "date": "20250528",
+   "size": "4 MB",
+   "url": "/MTFDocuments/OtraInfRelevante/2025/05/56303_OtraInfRelev_20250528_1.pdf",
+   "file": "56303_OtraInfRelev_20250528_1.pdf",
+   "restatement_declared": false,
+   "alternatives": [
+    "Informes financieros anuales y auditoria individual 2023",
+    "Retrasos en la informacion financiera correspondiente al cierre de 2023 y ejerci"
+   ]
+  },
+  "filing_prior": {
+   "status": "NO_DOC",
+   "n_docs": 0
+  },
+  "holdings": {
+   "status": "OK",
+   "n_docs": 11,
+   "title": "Participaciones significativas a 31 de diciembre de 2025",
+   "date": "20260109",
+   "size": "235 KB",
+   "url": "/MTFDocuments/OtraInfRelevante/2026/01/56303_OtraInfRelev_20260109_1.pdf",
+   "file": "56303_OtraInfRelev_20260109_1.pdf"
+  },
+  "lighthouse": {
+   "status": "NO_COVERAGE"
+  }
  }
 }

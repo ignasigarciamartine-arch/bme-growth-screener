@@ -1,0 +1,90 @@
+isin = "ES0105650008"
+name = "SUBSTRATE ARTIFICIAL"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 22
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 23
+method = "ocr"
+note = "EY; key audit matters follow on p23, no going-concern section"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 18018165
+scale = 1
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 31
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 17522550
+scale = 1
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 31
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 8608797
+scale = 1
+file = "05650_OtraInfRelev_20240429.pdf"
+page = 13
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 3135850
+scale = 1
+file = "05650_OtraInfRelev_20240429.pdf"
+page = 13
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[caveat]]
+text = "Growth is mostly acquisitions, and the FY2025 report charts 2022 and 2023 revenue (EUR 4.76M and 13.86M) differently from the FY2023 audited accounts used here (EUR 3.14M and 8.61M). With either series C3 clears 20% by far."
+refs = ["05650_OtraInfRelev_20260430.pdf#7", "05650_OtraInfRelev_20240429.pdf#13"]
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 38.15
+scale = "pct"
+file = "05650_OtraInfRelev_20260710.pdf"
+page = 1
+method = "pdftotext"
+note = "Subgen AI AB, class A shares, after the shares it pledged as collateral (58.82% before). Subgen is chaired by Substrate's CEO and run by its chairman (accounts p16). Class B holdings of the founders' vehicle JMSAN (12.17%) not added"
+
+[[figure]]
+metric = "domestic_revenue"
+year = 2025
+value = 6286203
+scale = 1
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 101
+method = "pdftotext"
+note = "Revenue by geography: ESPANA 6,286,203 of 18,018,165 total"
+
+
+[[judgement]]
+filter = "C6"
+verdict = "FAIL"
+text = "The report sets out strategic lines for 2025-2028 (Serenity Star, Substrate Cloud, the Talavera de la Reina project, acquisitions) and the notes mention a plan to 2030, but no quantified target is published."
+file = "05650_OtraInfRelev_20260430.pdf"
+page = 13
+method = "agent-read"

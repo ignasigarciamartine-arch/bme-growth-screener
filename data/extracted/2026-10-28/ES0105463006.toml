@@ -1,0 +1,58 @@
+isin = "ES0105463006"
+name = "MAKING SCIENCE"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05463_OtraInfRelev_20260327.pdf"
+page = 20
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "05463_OtraInfRelev_20260327.pdf"
+page = 21
+method = "ocr"
+note = "Grant Thornton; going concern is a key audit matter (p21) and there is an emphasis paragraph (p22), not a material-uncertainty section"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 348292267
+scale = 1
+file = "05463_OtraInfRelev_20260327.pdf"
+page = 29
+method = "ocr"
+note = "Consolidated P&L, Ingresos ordinarios (IFRS)"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 271323757
+scale = 1
+file = "05463_OtraInfRelev_20260327.pdf"
+page = 29
+method = "ocr"
+note = "Consolidated P&L, Ingresos ordinarios (IFRS); 2024 restated for a discontinued operation"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 235765733
+scale = 1
+file = "05463_OtraInfRelev_20240430.pdf"
+page = 34
+method = "ocr"
+note = "Consolidated P&L, Ingresos ordinarios (IFRS)"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 210132290
+scale = 1
+file = "05463_OtraInfRelev_20240430.pdf"
+page = 34
+method = "ocr"
+note = "Consolidated P&L, Ingresos ordinarios (IFRS)"

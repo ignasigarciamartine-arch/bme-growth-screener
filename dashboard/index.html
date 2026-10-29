@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BME Growth Screener</title>
+<meta name="description" content="An agent workflow that screens every company listed on BME Growth. Clone it and run it with your own AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#ffffff;--canvas:#f5f9fd;--dot:#d6e4f3;--node:#ffffff;--node-2:#eef4fb;--line:#d3e0ee;
+  --ink:#233F67;--ink-2:#4b6385;--ink-3:#7f93ad;
+  --agent:#487FCB;--agent-wash:rgba(72,127,203,.12);
+  --tool:#02418c;--tool-wash:rgba(2,65,140,.10);
+  --trig:#02418c;--sky:#8CCCF1;
+  --pass:#3fae52;--need:#d99a12;--fail:#d9534f;--edge:#9fb6d0;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --sans:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code{font-family:var(--mono);font-size:.9em}
+.top{max-width:84rem;margin:0 auto;padding:2.2rem 1rem 1.4rem}
+@media (min-width:48rem){.top{padding:3rem 2rem 1.6rem}}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .9rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.dots{display:inline-grid;grid-template-columns:repeat(2,.5rem);gap:.15rem;margin-right:.3rem}.dots i{width:.5rem;height:.5rem;border-radius:50%;background:var(--sky)}.dots i:nth-child(n+3){background:var(--tool)}
+.eyebrow .live{display:inline-flex;align-items:center;gap:.4rem;color:var(--tool)}
+.eyebrow .live::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:var(--tool)}
+h1{font-size:clamp(1.9rem,4.6vw,3.2rem);line-height:1.08;letter-spacing:-.015em;margin:0 0 .9rem;font-weight:700;color:var(--tool);max-width:22ch;text-wrap:balance}
+h1 em{font-style:normal;color:var(--agent)}
+.lede{color:var(--ink-2);max-width:64ch;margin:0 0 1.4rem;font-size:1.02rem}
+.actions{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.btn{border-radius:999px!important;display:inline-flex;align-items:center;gap:.55rem;font:600 .92rem var(--sans);padding:.7rem 1.1rem;border-radius:.55rem;border:1px solid var(--line);background:var(--node);color:var(--ink);text-decoration:none;cursor:pointer}
+.btn.run{background:var(--agent);border-color:var(--agent);color:#fff;border-radius:999px}
+.btn.run svg{width:.8rem;height:.8rem}
+.btn:hover{filter:brightness(1.1)}
+.meta{font-family:var(--mono);font-size:.74rem;color:var(--ink-3);margin-left:.3rem}
+.clone-note{margin:.8rem 0 0 .2rem;font-size:.85rem;color:var(--ink-3);max-width:64ch;overflow-wrap:anywhere}
+.clone-note code{font-family:var(--mono);font-size:.78rem}
+
+.kpis{max-width:84rem;margin:0 auto;padding:0 1rem 1.2rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+@media (min-width:48rem){.kpis{padding:0 2rem 1.4rem;grid-template-columns:repeat(5,minmax(0,1fr))}}
+.kpi{background:var(--canvas);border:1px solid var(--line);border-radius:.6rem;padding:.75rem .9rem}
+.kpi .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{color:var(--tool);font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:1.6rem;line-height:1.2}
+.kpi.pass .v{color:var(--pass)}.kpi.need .v{color:var(--need)}.kpi.fail .v{color:var(--fail)}
+
+.stage{max-width:84rem;margin:0 auto;padding:0 1rem}
+@media (min-width:48rem){.stage{padding:0 2rem}}
+.board{background:var(--canvas);border:1px solid var(--line);border-radius:.8rem;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr)}
+
+.bar{display:flex;white-space:nowrap;justify-content:space-between;align-items:center;gap:1rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.72rem;color:var(--ink-3)}
+.bar .tabs{display:flex;gap:.3rem}
+@media (max-width:30rem){.bar .count{display:none}}
+.bar .tabs span{padding:.25rem .6rem;border-radius:.35rem}
+.bar .tabs span.on{background:var(--node-2);color:var(--ink)}
+.canvas-wrap{overflow-x:auto;background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:18px 18px}
+.hint{display:block;font-family:var(--mono);font-size:.68rem;color:var(--ink-3);padding:.5rem .9rem 0}
+@media (min-width:64rem){.hint{display:none}}
+svg.graph{display:block;width:100%;min-width:900px;height:auto}
+.edge{fill:none;stroke:var(--edge);stroke-width:2}
+.edge.pass{stroke:var(--pass);opacity:.7}.edge.need{stroke:var(--need);opacity:.7}.edge.fail{stroke:var(--fail);opacity:.7}
+.elabel{font:600 11px var(--mono);fill:var(--ink-2)}
+.elabel-bg{fill:var(--canvas)}
+.node{cursor:pointer}
+.node rect.box{fill:var(--node);stroke:var(--line);stroke-width:1.5;transition:stroke .15s;filter:drop-shadow(0 2px 4px rgba(35,63,103,.08))}
+.node:hover rect.box,.node.sel rect.box{stroke:var(--ink-2)}
+.node.agent rect.box{stroke:rgba(72,127,203,.55)}
+.node.agent.sel rect.box,.node.agent:hover rect.box{stroke:var(--agent)}
+.node .ico{fill:var(--node-2)}
+.node.agent .ico{fill:var(--agent-wash)}
+.node.tool .ico{fill:var(--tool-wash)}
+.node .glyph{font:700 15px var(--mono);text-anchor:middle;dominant-baseline:central}
+.node.agent .glyph{fill:var(--agent)}.node.tool .glyph{fill:var(--tool)}.node.trig .glyph{fill:var(--trig)}
+.node .t{font:600 15px var(--sans);fill:var(--ink)}
+.node .s{font:12px var(--sans);fill:var(--ink-3)}
+.node .tag{font:700 9.5px var(--mono);letter-spacing:.12em}
+.node.agent .tag{fill:var(--agent)}.node.tool .tag{fill:var(--tool)}.node.trig .tag{fill:var(--trig)}
+.port{fill:var(--canvas);stroke:var(--edge);stroke-width:2}
+.gate{font:700 10px var(--mono);text-anchor:middle;dominant-baseline:central;fill:var(--ink-2)}
+.gate-box{fill:var(--node-2);stroke:var(--line)}
+.gate-box.f8{stroke:var(--agent);fill:var(--agent-wash)}
+.out .n{font:700 22px var(--mono)}
+.out.pass .n{fill:var(--pass)}.out.need .n{fill:var(--need)}.out.fail .n{fill:var(--fail)}
+.out.pass rect.box{stroke:rgba(63,174,82,.55)}.out.need rect.box{stroke:rgba(217,154,18,.55)}.out.fail rect.box{stroke:rgba(217,83,79,.55)}
+
+.panel{border-top:1px solid var(--line);padding:1rem 1.1rem 1.3rem}
+@media (min-width:64rem){.panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:0 2.5rem;align-items:start}.panel .head{grid-row:span 2}}
+.panel .kind{font-family:var(--mono);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;display:inline-block;padding:.18rem .5rem;border-radius:999px;margin:0 0 .6rem}
+.panel .kind.agent{color:var(--agent);background:var(--agent-wash)}
+.panel .kind.tool{color:var(--tool);background:var(--tool-wash)}
+.panel .kind.trig{color:var(--trig);background:rgba(2,65,140,.10)}
+.panel h2{font-size:1.15rem;margin:0 0 .5rem;letter-spacing:-.01em}
+.panel p{margin:0 0 .8rem;color:var(--ink-2);font-size:.9rem}
+.panel dl{margin:0;display:grid;grid-template-columns:5.2rem minmax(0,1fr);gap:.4rem .7rem;font-size:.84rem}
+.panel dt{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:.15rem}
+.panel dd{margin:0;color:var(--ink-2);overflow-wrap:anywhere}
+.panel code{color:var(--ink)}
+
+.below{max-width:84rem;margin:0 auto;padding:2.4rem 1rem 3rem;display:grid;gap:2rem}
+@media (min-width:48rem){.below{padding:2.8rem 2rem 4rem}}
+.below h3{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:400;margin:0 0 .9rem}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.6rem}
+.f{background:var(--canvas);border:1px solid var(--line);border-radius:.6rem;padding:.8rem .9rem}
+.f.agent{border-color:rgba(72,127,203,.55)}
+.f b{font-family:var(--mono);color:var(--tool);font-size:.78rem;margin-right:.4rem}
+.f.agent b{color:var(--agent)}
+.f .l{font-weight:600}
+.f .r{display:block;color:var(--ink-2);font-size:.86rem;margin-top:.2rem}
+.rule{border:1px solid var(--line);border-left:3px solid var(--agent);border-radius:.4rem;padding:1rem 1.1rem;background:var(--canvas);max-width:62rem}
+.rule p{margin:0;color:var(--ink-2)}
+.rule p b{color:var(--ink)}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.6rem}
+.step{background:var(--canvas);border:1px solid var(--line);border-radius:.6rem;padding:.9rem}
+.step .no{font-family:var(--mono);font-size:.7rem;color:var(--ink-3)}
+.step pre{margin:.5rem 0 0;font-family:var(--mono);font-size:.8rem;color:var(--tool);white-space:pre-wrap;word-break:break-word}
+footer{max-width:84rem;margin:0 auto;padding:0 1rem 3rem;color:var(--ink-3);font-size:.8rem}
+@media (min-width:48rem){footer{padding:0 2rem 3rem}}
+
+/* legibility + colour pass */
+:root{--ink:#111418;--ink-2:#2b2f36;--ink-3:#4a5160;--edge:#6b88ad;--line:#c4d4e6}
+.edge{stroke-width:2.6}
+.node .t{font:700 14.5px var(--sans);fill:#111418}
+.node .s{font:500 11.5px var(--sans);fill:#2b2f36}
+.node .tag{font:800 10px var(--mono)}
+.node rect.box{stroke-width:2}
+.node.trig rect.box{fill:#02418c;stroke:#02418c}
+.node.trig .t,.node.trig .s,.node.trig .tag{fill:#fff}
+.node.trig .ico{fill:rgba(255,255,255,.18)}.node.trig .glyph{fill:#fff}
+.node[data-id=orch] rect.box,.node[data-id=universe] rect.box{fill:#dbe8f8;stroke:#487FCB}
+.node[data-id=accounts] rect.box{fill:#e0f2fc;stroke:#2f9fd8}
+.node[data-id=holders] rect.box{fill:#ece4fb;stroke:#7c5cd6}
+.node[data-id=lighthouse] rect.box{fill:#fdf0dc;stroke:#e09a2b}
+.node[data-id=accounts] .tag,.node[data-id=accounts] .glyph{fill:#1d7fb3}
+.node[data-id=holders] .tag,.node[data-id=holders] .glyph{fill:#6343c4}
+.node[data-id=lighthouse] .tag,.node[data-id=lighthouse] .glyph{fill:#b97412}
+.node[data-id=reader] rect.box{fill:#dbe8f8;stroke:#487FCB}
+.node.tool[data-id=verifier] rect.box{fill:#ddf5e3;stroke:#2f9e4f}
+.node.tool[data-id=verifier] .tag,.node.tool[data-id=verifier] .glyph{fill:#1f7a3a}
+.node[data-id=filter] rect.box{fill:#ffffff;stroke:#02418c;stroke-width:2.5}
+.node .ico{fill:rgba(255,255,255,.75)}
+.gate-box{fill:#eef4fb;stroke:#9fb6d0}.gate{fill:#111418;font-size:11px}
+.gate-box.f8{fill:#dbe8f8;stroke:#487FCB}
+.out.pass rect.box{fill:#dcf3e2;stroke:#2f9e4f}.out.need rect.box{fill:#fdf0d5;stroke:#d99a12}.out.fail rect.box{fill:#fbe0df;stroke:#d9534f}
+.out.pass .n{fill:#1f7a3a}.out.need .n{fill:#a86f00}.out.fail .n{fill:#b3302c}
+.elabel{fill:#111418;font-size:12px}
+.kpi .k,.below h3,.eyebrow,.bar,.panel dt{color:#4a5160}
+.kpi.pass{background:#dcf3e2;border-color:#2f9e4f}.kpi.need{background:#fdf0d5;border-color:#d99a12}.kpi.fail{background:#fbe0df;border-color:#d9534f}
+.f{border-left:4px solid #487FCB}.f.agent{border-left-color:#7c5cd6;background:#f6f2fe}
+.f b{color:#02418c}.f.agent b{color:#6343c4}
+.f .l{color:#111418}.f .r{color:#2b2f36}
+.lede,.panel p,.panel dd,.rule p{color:#2b2f36}
+.me{position:absolute;top:1.4rem;right:1.4rem;display:flex;align-items:center;gap:1rem;font:700 1.35rem var(--sans);color:#111418}
+.me a{display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;color:#fff;background:#0a66c2;border-radius:999px;padding:.6rem 1.2rem;font-size:1.05rem}
+.me a svg{width:1.2rem;height:1.2rem}
+.top{position:relative}
+@media (max-width:40rem){.me{position:static;margin-bottom:1.2rem;font-size:1.15rem;flex-wrap:wrap;gap:.6rem}}
+@media (min-width:40rem) and (max-width:72rem){.top{padding-top:5.5rem}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="me"><span>Ignasi Garcia Martin</span><a href="https://www.linkedin.com/in/ignasi-garcia"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.8-2 4 0 4.8 2.6 4.8 6V21h-4v-5.6c0-1.3 0-3-1.9-3s-2.2 1.5-2.2 2.9V21H9z"/></svg>LinkedIn</a></div>
+  <p class="eyebrow"><span class="dots"><i></i><i></i><i></i><i></i></span><span>Prepared for 4Founders Capital</span><span>·</span><span>bme-growth-screener</span><span>·</span><span class="live">example run · 28 Oct 2026</span></p>
+  <h1>Every company on BME Growth, screened by <em>your own agents</em></h1>
+  <p class="lede">109 listed companies, seven filters read from 4Founders’ published investment criteria, and every figure tied to the PDF and page it came from. Clone the repo, open it with Claude Code or Codex, type <code>/screen</code>. This graph shows what each step does.</p>
+  <div class="actions">
+    <a class="btn run" href="https://github.com/ignasigarciamartine-arch/bme-growth-screener"><svg viewBox="0 0 10 10"><path d="M1 0l9 5-9 5z" fill="currentColor"/></svg>Start process</a>
+    <a class="btn" href="results.html">See the results →</a>
+  </div>
+  <p class="clone-note">Start process takes you to the repo on GitHub. Clone it, open it with Claude Code or Codex and type <code>/screen</code>:<br><code>git clone https://github.com/ignasigarciamartine-arch/bme-growth-screener</code></p>
+</header>
+
+<section class="kpis" aria-label="Result">
+  <div class="kpi"><div class="k">Listed</div><div class="v">109</div></div>
+  <div class="kpi"><div class="k">In ticket band</div><div class="v">34</div></div>
+  <div class="kpi pass"><div class="k">Pass</div><div class="v">1</div></div>
+  <div class="kpi need"><div class="k">Needs data</div><div class="v">0</div></div>
+  <div class="kpi fail"><div class="k">Fail</div><div class="v">33</div></div>
+</section>
+
+<section class="stage">
+  <div class="board">
+    <div>
+      <div class="bar"><div class="tabs"><span class="on">Workflow</span><span>Report</span></div><span class="count">4 agents · 4 code steps</span></div>
+      <span class="hint">← swipe to see the whole graph →</span>
+      <div class="canvas-wrap">
+<svg class="graph" viewBox="0 70 1660 460" role="img" aria-label="Agent workflow graph">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10z" fill="#9fb6d0"/></marker></defs>
+  <path class="edge " d="M170 300 C185.0 300 185.0 300 200 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M370 300 C385.0 300 385.0 300 400 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M570 300 C585.0 300 585.0 140 600 140" marker-end="url(#ar)"/>
+  <path class="edge " d="M570 300 C585.0 300 585.0 300 600 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M570 300 C585.0 300 585.0 460 600 460" marker-end="url(#ar)"/>
+  <path class="edge " d="M770 140 C785.0 140 785.0 300 800 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M770 300 C785.0 300 785.0 300 800 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M770 460 C785.0 460 785.0 300 800 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M970 300 C985.0 300 985.0 300 1000 300" marker-end="url(#ar)"/>
+  <path class="edge " d="M1170 300 C1185.0 300 1185.0 300 1200 300" marker-end="url(#ar)"/>
+  <path class="edge pass" d="M1440 300 C1455.0 300 1455.0 150 1470 150" marker-end="url(#ar)"/>
+  <path class="edge need" d="M1440 300 C1455.0 300 1455.0 300 1470 300" marker-end="url(#ar)"/>
+  <path class="edge fail" d="M1440 300 C1455.0 300 1455.0 450 1470 450" marker-end="url(#ar)"/>
+  <g><rect class="elabel-bg" x="368.0" y="276" width="34" height="17" rx="3"/><text class="elabel" x="385" y="289" text-anchor="middle">109</text></g>
+  <g><rect class="elabel-bg" x="572.0" y="276" width="26" height="17" rx="3"/><text class="elabel" x="585" y="289" text-anchor="middle">34</text></g>
+  <g><rect class="elabel-bg" x="1172.0" y="276" width="26" height="17" rx="3"/><text class="elabel" x="1185" y="289" text-anchor="middle">34</text></g>
+  <g class="node trig" data-id="start" transform="translate(20,258)">
+    <rect class="box" width="150" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">▶</text>
+    <text class="tag" x="60" y="28.0">TRIGGER</text><text class="t" x="60" y="46.0">/screen</text><text class="s" x="60" y="63.0">you start it</text>
+<circle class="port" cx="150" cy="42.0" r="5"/>
+  </g>
+  <g class="node agent" data-id="orch" transform="translate(200,258)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">◎</text>
+    <text class="tag" x="60" y="28.0">AGENT</text><text class="t" x="60" y="46.0">Orchestrator</text><text class="s" x="60" y="63.0">reads the criteria</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node tool" data-id="universe" transform="translate(400,258)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">◇</text>
+    <text class="tag" x="60" y="28.0">CODE</text><text class="t" x="60" y="46.0">Universe</text><text class="s" x="60" y="63.0">109 listed → 34</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node tool" data-id="accounts" transform="translate(600,98)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">€</text>
+    <text class="tag" x="60" y="28.0">CODE</text><text class="t" x="60" y="46.0">Accounts</text><text class="s" x="60" y="63.0">audited, 2 years</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node agent" data-id="holders" transform="translate(600,258)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">%</text>
+    <text class="tag" x="60" y="28.0">AGENT</text><text class="t" x="60" y="46.0">Shareholders</text><text class="s" x="60" y="63.0">who owns the float</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node tool" data-id="lighthouse" transform="translate(600,418)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">≡</text>
+    <text class="tag" x="60" y="28.0">CODE</text><text class="t" x="60" y="46.0">Lighthouse</text><text class="s" x="60" y="63.0">analyst sheets</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node agent" data-id="reader" transform="translate(800,258)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">⌕</text>
+    <text class="tag" x="60" y="28.0">AGENT</text><text class="t" x="60" y="46.0">Reader</text><text class="s" x="60" y="63.0">figure, PDF, page</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node tool" data-id="verifier" transform="translate(1000,258)">
+    <rect class="box" width="170" height="84" rx="14"/>
+    <rect class="ico" x="12" y="23.0" width="38" height="38" rx="10"/><text class="glyph" x="31" y="42.0">✓</text>
+    <text class="tag" x="60" y="28.0">CODE · NOT AI</text><text class="t" x="60" y="46.0">Verifier</text><text class="s" x="60" y="63.0">checks the page</text>
+    <circle class="port" cx="0" cy="42.0" r="5"/><circle class="port" cx="170" cy="42.0" r="5"/>
+  </g>
+  <g class="node agent" data-id="filter" transform="translate(1200,225)">
+    <rect class="box" width="240" height="150" rx="14"/>
+    <rect class="ico" x="12" y="14" width="38" height="38" rx="10"/><text class="glyph" x="31" y="33">⧩</text>
+    <text class="tag" x="60" y="26">AGENT + TOOL</text><text class="t" x="60" y="44">Filter</text><text class="s" x="60" y="61">7 gates, any fail is out</text>
+    <g transform="translate(16,80)">
+      <rect class="gate-box" x="0" y="0" width="46" height="24" rx="5"/><text class="gate" x="23" y="12">C1</text>
+      <rect class="gate-box f8" x="52" y="0" width="46" height="24" rx="5"/><text class="gate" x="75" y="12" style="fill:var(--agent)">C2</text>
+      <rect class="gate-box" x="104" y="0" width="46" height="24" rx="5"/><text class="gate" x="127" y="12">C3</text>
+      <rect class="gate-box" x="156" y="0" width="46" height="24" rx="5"/><text class="gate" x="179" y="12">C4</text>
+      <rect class="gate-box f8" x="0" y="30" width="46" height="24" rx="5"/><text class="gate" x="23" y="42" style="fill:var(--agent)">C5</text>
+      <rect class="gate-box f8" x="52" y="30" width="46" height="24" rx="5"/><text class="gate" x="75" y="42" style="fill:var(--agent)">C6</text>
+      <rect class="gate-box" x="104" y="30" width="46" height="24" rx="5"/><text class="gate" x="127" y="42">C7</text>
+    </g>
+    <circle class="port" cx="0" cy="75" r="5"/><circle class="port" cx="240" cy="75" r="5"/>
+  </g>
+  <g class="node out pass" data-id="pass" transform="translate(1470,112)">
+    <rect class="box" width="170" height="76" rx="14"/>
+    <text class="n" x="16" y="47">1</text><text class="tag" x="44" y="28" style="fill:var(--pass)">PASS</text><text class="s" x="44" y="46">Cuatroochenta</text><text class="s" x="44" y="62">cloud + cybersecurity</text>
+  </g>
+  <g class="node out need" data-id="need" transform="translate(1470,262)">
+    <rect class="box" width="170" height="76" rx="14"/>
+    <text class="n" x="16" y="47">0</text><text class="tag" x="56" y="28" style="fill:var(--need)">NEEDS DATA</text><text class="s" x="56" y="46">never counted</text><text class="s" x="56" y="62">as a pass</text>
+  </g>
+  <g class="node out fail" data-id="fail" transform="translate(1470,412)">
+    <rect class="box" width="170" height="76" rx="14"/>
+    <text class="n" x="16" y="47">33</text><text class="tag" x="56" y="28" style="fill:var(--fail)">FAIL</text><text class="s" x="56" y="46">with the filter</text><text class="s" x="56" y="62">and the figure</text>
+  </g>
+</svg>
+      </div>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</section>
+
+<section class="below">
+  <div>
+    <h3>Seven filters, read from 4Founders’ published investment criteria</h3>
+    <div class="filters">
+      <div class="f"><b>C1</b><span class="l">Ticket fit</span><span class="r">Market cap EUR 5–80M, so a EUR 100K–4M ticket is 5–20% of the company. <i>Criterion 03</i></span></div>
+      <div class="f agent"><b>C2</b><span class="l">Strong tech component</span><span class="r">Technology sector, or the agent shows, with its source, that technology is the product. <i>Criterion 02</i></span></div>
+      <div class="f"><b>C3</b><span class="l">Scale</span><span class="r">Revenue CAGR over 3 years ≥ 20%. <i>Criterion 02</i></span></div>
+      <div class="f"><b>C4</b><span class="l">Ownership</span><span class="r">Founders and management hold ≥ 20% of the shares. <i>Criterion 01</i></span></div>
+      <div class="f agent"><b>C5</b><span class="l">International mindset</span><span class="r">≥ 25% of revenue outside Spain, read from the segment note. <i>Criterion 01</i></span></div>
+      <div class="f agent"><b>C6</b><span class="l">Ambition</span><span class="r">A published growth plan with quantified, dated targets. <i>Criterion 01</i></span></div>
+      <div class="f"><b>C7</b><span class="l">Clean accounts</span><span class="r">Audit opinion clean, no going-concern doubt. Hygiene.</span></div>
+    </div>
+  </div>
+  <div class="rule"><p><b>The rule the agents cannot break.</b> No agent can give a PASS on a figure the verifier has not found on its page. A missing figure is NEEDS DATA, never a pass. The verifier is plain code, so the check does not depend on which AI you run it with.</p></div>
+  <div>
+    <h3>Run it yourself</h3>
+    <div class="howto">
+      <div class="step"><span class="no">01 · clone</span><pre>git clone https://github.com/ignasigarciamartine-arch/bme-growth-screener</pre></div>
+      <div class="step"><span class="no">02 · open it with your AI</span><pre>claude   # or: codex</pre></div>
+      <div class="step"><span class="no">03 · start</span><pre>/screen</pre></div>
+    </div>
+  </div>
+</section>
+
+<footer>Public data only: BME Growth filings and Lighthouse sheets. A screen, not investment advice. Ignasi Garcia Martin · MIT licence.</footer>
+
+<script>
+const D={
+ start:{k:'trig',t:'/screen',d:'You start the run from Claude Code or Codex. One command, one date.',src:'your terminal',out:'a run folder, runs/&lt;date&gt;/',file:'.claude/commands/screen.md'},
+ orch:{k:'agent',t:'Orchestrator',d:'Reads the criteria first and never changes them mid-run. Runs the code, reads the work queue and hands each company to the agent it names, round after round until the queue is empty.',src:'config/criteria.toml',out:'runs/&lt;date&gt;/todo.csv',file:'.claude/agents/orchestrator.md'},
+ universe:{k:'tool',t:'Universe',d:'Pulls every company on BME Growth from the exchange’s own API, removes property vehicles (SOCIMIs and two more) and keeps the market caps where a 4Founders ticket fits.',src:'BME public API',out:'109 → 55 → 34',file:'screener/universe.py'},
+ accounts:{k:'tool',t:'Accounts',d:'Downloads the audited annual accounts for the last year and two years before from the exchange’s API, and opens PDFs nested inside PDFs. The reader agent then reads them.',src:'BME filings, type 001',out:'2 PDFs per company',file:'screener/sources.py'},
+ holders:{k:'agent',t:'Shareholders',d:'Reads the significant-holdings filing and the board list to work out how much founders, directors and managers own. Funds and family offices without a seat do not count.',src:'BME filings, type 006',out:'free float, strict',file:'screener/sources.py'},
+ lighthouse:{k:'tool',t:'Lighthouse',d:'Downloads the independent analyst sheets that put every company in the same table.',src:'IEAF Lighthouse',out:'comparable sheet',file:'screener/sources.py'},
+ reader:{k:'agent',t:'Reader',d:'Reads the figures the code cannot: scanned pages, broken table columns. Writes each one down with its value, scale, year, PDF and page.',src:'the PDFs above',out:'data/extracted/&lt;isin&gt;.toml',file:'.claude/agents/reader.md'},
+ verifier:{k:'tool',t:'Verifier',d:'Plain code. Opens the page the agent cited and looks for the number. If it is not there, the figure does not count. Local OCR for scanned pages.',src:'the cited page',out:'FOUND / NOT FOUND',file:'screener/verify.py'},
+ filter:{k:'agent',t:'Filter',d:'C1, C3, C4 and C7 run with the screening tool on verified figures only. C2, C5 and C6 are reasoned by the agent and must cite their source.',src:'verified figures',out:'PASS / NEEDS DATA / FAIL',file:'screener/screen.py'},
+ pass:{k:'tool',t:'1 pass',d:'Cuatroochenta: cloud software and cybersecurity, revenue +25.5% a year since 2022, founders hold 29.3%, 44% of revenue outside Spain, Guidance 2030 of EUR 70M revenue. Every figure links to its page.',src:'run of 28 Oct 2026',out:'report.html',file:'examples/report-2026-10-28.html'},
+ need:{k:'tool',t:'0 need data',d:'Every open figure was read or written up as not in the documents. A missing figure is never a pass.',src:'run of 28 Oct 2026',out:'report.html',file:'examples/report-2026-10-28.html'},
+ fail:{k:'tool',t:'33 fail',d:'20 are not technology companies, 5 grow less than 20% a year, 5 fail on the audit, 3 on international reach or the growth plan. Each names the filter, the figure and the page.',src:'run of 28 Oct 2026',out:'report.html',file:'examples/report-2026-10-28.html'}
+};
+const kindLabel={agent:'Agent',tool:'Code',trig:'Trigger'};
+const panel=document.getElementById('panel');
+function show(id){
+  const n=D[id];if(!n)return;
+  document.querySelectorAll('.node').forEach(g=>g.classList.toggle('sel',g.dataset.id===id));
+  panel.innerHTML=`<div class="head"><span class="kind ${n.k}">${kindLabel[n.k]}</span><h2>${n.t}</h2><p>${n.d}</p></div><dl><dt>Reads</dt><dd>${n.src}</dd><dt>Writes</dt><dd>${n.out}</dd><dt>In repo</dt><dd><code>${n.file}</code></dd></dl>`;
+}
+document.querySelectorAll('.node').forEach(g=>g.addEventListener('click',()=>show(g.dataset.id)));
+show('filter');
+</script>
+</body>
+</html>

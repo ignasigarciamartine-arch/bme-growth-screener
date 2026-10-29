@@ -1,7 +1,7 @@
 isin = "ES0105029005"
 name = "FACEPHI BIOMETRIA"
 # FY2025 pack: 05029_OtraInfRelev_20260504_1.pdf (consolidated report p35, individual p139).
-# Only the opinion is entered: it decides the case (F7 FAIL), so the rest was not read.
+# Only the opinion is entered: it decides the case (C7 FAIL), so the rest was not read.
 
 [[figure]]
 metric = "audit_opinion"

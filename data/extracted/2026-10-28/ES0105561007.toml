@@ -1,0 +1,18 @@
+isin = "ES0105561007"
+name = "PARLEM TELECOM"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05561_OtraInfRelev_20260430_1.pdf"
+page = 20
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = true
+file = "05561_OtraInfRelev_20260430_1.pdf"
+page = 21
+method = "ocr"
+note = "Material uncertainty on going concern: covenant breaches moved debt to current liabilities"

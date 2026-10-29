@@ -1,6 +1,6 @@
 isin = "ES0143328005"
 name = "GRIÑÓ ECOLOGIC"
-# Free float alone decides the case (F6 FAIL): the controlling holder leaves at most 11.76%.
+# The controlling holder (88.24%) passes C4; the case fails on C2 (judgement below).
 # Holdings filing at 30-Jun-2026: 43328_OtraInfRelev_20260709.pdf.
 
 [[figure]]
@@ -11,3 +11,11 @@ file = "43328_OtraInfRelev_20260709.pdf"
 page = 1
 method = "pdftotext"
 note = "Corporacio Grino S.L., controlling holder (parent of the group)"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Waste management and material and energy recovery. An industrial-services operator."
+file = "43328_OtraInfRelev_20260430.pdf"
+page = 7
+method = "agent-read"

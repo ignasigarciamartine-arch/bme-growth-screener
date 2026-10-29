@@ -44,56 +44,6 @@ method = "pdftotext"
 note = "Consolidated P&L FY2023, 2022 comparative"
 
 [[figure]]
-metric = "ebit"
-year = 2025
-value = 7_240_935
-scale = 1
-file = "75589_OtraInfRelev_20260428.pdf"
-page = 48
-method = "pdftotext"
-note = "Resultado de explotacion"
-
-[[figure]]
-metric = "da"
-year = 2025
-value = 2_632_885
-scale = 1
-file = "75589_OtraInfRelev_20260428.pdf"
-page = 48
-method = "pdftotext"
-note = "Amortizacion del inmovilizado (EBITDA 9,873,820 vs 9,873,819 stated in the notes, p181)"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 12_992_795
-scale = 1
-file = "75589_OtraInfRelev_20260428.pdf"
-page = 47
-method = "pdftotext"
-note = "Deudas a largo plazo (bank 11,388,246 + other 1,604,549)"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 8_001_423
-scale = 1
-file = "75589_OtraInfRelev_20260428.pdf"
-page = 47
-method = "pdftotext"
-note = "Deudas a corto plazo (bank 7,193,390 + other 808,033)"
-
-[[figure]]
-metric = "cash"
-year = 2025
-value = 9_439_927
-scale = 1
-file = "75589_OtraInfRelev_20260428.pdf"
-page = 46
-method = "pdftotext"
-note = "Efectivo y otros activos liquidos equivalentes"
-
-[[figure]]
 metric = "audit_opinion"
 value = "CLEAN"
 file = "75589_OtraInfRelev_20260428.pdf"
@@ -120,13 +70,4 @@ note = """Lighthouse sheet of 24-Apr-2025, shareholder box: Suarez Garcia family
 T. Reinares 5.9, M. A. Busto 5.7, free float 19.3. It leaves out founders, managers and both \
 5% holders, so it is not above the criteria definition. Cross-check, holdings filing \
 75589_OtraInfRelev_20260709_1.pdf p1 (30-Jun-2026): holders of 5% or more add up to 69.04%, \
-consistent. Stale (Apr-2025) and only 4.3 points above the bar: the weakest input of the case."""
-
-# Caveats shown in the report. {placeholders} are filled from the figures of this run;
-# refs are "metric", "metric:year" or "file.pdf#page".
-[[caveat]]
-text = """Free float of {ff:.1f}% comes from a Lighthouse sheet dated {ff_date}, {ff_age} months before \
-the universe date, and clears the 15% bar by {ff_margin:.1f} points: the narrowest pass of the four. \
-The holdings filing at 30 June 2026 agrees with it (holders of 5% or more: 69.04%, which leaves at \
-most 30.96% before managers and treasury stock) but does not replace it."""
-refs = ["free_float_pct", "75589_OtraInfRelev_20260709_1.pdf#1"]
+consistent."""

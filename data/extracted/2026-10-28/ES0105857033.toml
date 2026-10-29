@@ -1,0 +1,20 @@
+isin = "ES0105857033"
+name = "REDEGAL"
+# FY2025 pack 05857_OtraInfRelev_20260424_1.pdf (Kreston Iberaudit). The text parse found the
+# going-concern section but not the opinion paragraph: both are entered here with their page.
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05857_OtraInfRelev_20260424_1.pdf"
+page = 166
+method = "pdftotext"
+note = "Kreston Iberaudit, consolidated FY2025: unmodified opinion ('Nuestra opinion no ha sido modificada'). Individual report, p78: also unmodified."
+
+[[figure]]
+metric = "going_concern"
+value = true
+file = "05857_OtraInfRelev_20260424_1.pdf"
+page = 166
+method = "pdftotext"
+note = "Consolidated FY2025: section 'Incertidumbre material relacionada con la empresa en funcionamiento': negative equity of EUR -623,089 and current liabilities above current assets by EUR 2,758,341 (note 2 e). Individual report, p78: same section, working capital EUR -1,689,675."

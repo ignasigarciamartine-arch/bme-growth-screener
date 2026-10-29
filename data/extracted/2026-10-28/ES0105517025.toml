@@ -1,0 +1,10 @@
+isin = "ES0105517025"
+name = "ENERGIA INNOVACION"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Builds, installs, operates and maintains solar, wind and other energy installations (CNAE 4321, electrical installation). A contractor, not a technology product."
+file = "05517_OtraInfRelev_20250430.pdf"
+page = 37
+method = "agent-read"

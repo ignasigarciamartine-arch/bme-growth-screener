@@ -83,7 +83,7 @@ def select_filings(records, issuer_code, as_of):
 
 def select_prior(records, issuer_code, as_of, latest_year, gap=2):
     """The accounts `gap` years before the latest ones. With the comparatives
-    each set carries, latest + prior give the four revenue figures F4 needs."""
+    each set carries, latest + prior give the four revenue figures C3 needs."""
     if not latest_year:
         return {"status": "NO_DOC", "n_docs": 0}
     rs = [r for r in records if (r.get("financialInfoYear") or 0) == latest_year - gap]
@@ -105,7 +105,7 @@ def harvest_filings(candidates, as_of, log=print):
 def harvest_holdings(candidates, as_of, log=print):
     """Latest 'Participaciones significativas' (type 006) published by as_of:
     holders of 5% or more and directors and managers with 1% or more. It is
-    the primary source for free float (F6)."""
+    the primary source for insider ownership (C4)."""
     out = {}
     for c in candidates:
         recs = bme.documents(c["issuer_code"], "006", as_of.strftime("%Y%m%d"))

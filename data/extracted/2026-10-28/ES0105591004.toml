@@ -1,0 +1,10 @@
+isin = "ES0105591004"
+name = "LLORENTE Y CUENCA"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Communication, image and public-relations consultancy. A people business."
+file = "05591_OtraInfRelev_20260429.pdf"
+page = 31
+method = "agent-read"

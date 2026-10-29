@@ -16,7 +16,7 @@ def _csv(path, rows):
 
 
 def funnel_lines(stages, screened, cfg):
-    u = cfg["universe"]
+    u, f1 = cfg["universe"], cfg["filters"]["C1"]
     v = {k: [r for r in screened if r["verdict"] == k] for k in ("PASS", "NEEDS_DATA", "FAIL")}
     after = [r["name"] for r in stages["listed"] if r.get("mcap_basis") == "latest_close_after_as_of"]
     lines = [
@@ -25,24 +25,24 @@ def funnel_lines(stages, screened, cfg):
         f"  Listed in {u['market']:<34}{len(stages['listed']):>5}",
         f"  - SOCIMIs (property vehicles){'':<15}{-len(stages['excluded_subsector']):>5}",
         f"  = Operating companies{'':<23}{len(stages['operating']):>5}",
-        f"  - Outside F1 band (EUR 10-200M){'':<13}{-len(stages['outside_band']):>5}",
+        f"  - Outside C1 band (EUR {f1['min_eur'] / 1e6:g}-{f1['max_eur'] / 1e6:g}M){'':<14}{-len(stages['outside_band']):>5}",
         f"  = Inside the band{'':<27}{len(stages['in_band']):>5}",
         f"  - Excluded by name (see config){'':<13}{-len(stages['excluded_isin']):>5}",
         f"  = Candidates screened{'':<23}{len(stages['candidates']):>5}",
         "",
-        f"  Automated filters F1-F7 (F8 is manual):",
+        f"  Filters C1-C7 (agents read and judge, the verifier checks):",
         f"    FAIL       {len(v['FAIL']):>3}",
         f"    NEEDS_DATA {len(v['NEEDS_DATA']):>3}",
         f"    PASS       {len(v['PASS']):>3}",
     ]
     if after:
         lines += ["", f"  Note: no price history before as_of for {', '.join(after)};",
-                  "        latest close used for F1 (all far outside the band)."]
+                  "        latest close used for C1."]
     return lines
 
 
-SRC_COLUMNS = ("src_revenue", "src_ebitda", "src_net_debt", "src_free_float",
-               "src_revenue_history", "src_opinion")
+SRC_COLUMNS = ("src_revenue", "src_revenue_history", "src_insider", "src_free_float",
+               "src_intl", "src_judgement_C2", "src_judgement_C6", "src_opinion")
 
 
 def provenance_lines(screened, figure_checks, ocr):
@@ -84,14 +84,14 @@ def pass_lines(screened):
     out = []
     for r in (x for x in screened if x["verdict"] == "PASS"):
         out += [f"### {r['name']} ({r['isin']}), FY{r['fiscal_year']}", "",
-                f"- F1 market cap EUR {_m(r['market_cap_eur_m'])}M (BME close, snapshot)",
-                f"- F2 revenue EUR {_m(r['revenue_eur_m'], 2)}M: {r['src_revenue']}",
-                f"- F3 EBITDA EUR {_m(r['ebitda_eur_m'], 2)}M: {r['src_ebitda']}",
-                f"- F4 revenue CAGR 3y {_m(r['revenue_cagr_3y_pct'])}%: {r['src_revenue_history']}",
-                f"- F5 net debt EUR {_m(r['net_debt_eur_m'], 2)}M, {_m(r['nd_ebitda'], 2)}x EBITDA: "
-                f"{r['src_net_debt']}",
-                f"- F6 free float {_m(r['free_float_pct'])}%: {r['src_free_float']}",
-                f"- F7 opinion {r['audit_opinion']}, going concern {r['going_concern']}: {r['src_opinion']}",
+                f"- C1 market cap EUR {_m(r['market_cap_eur_m'])}M (BME close, snapshot)",
+                f"- C2 {r['note_C2']}" + (f": {r['judgement_C2']} ({r['src_judgement_C2']})"
+                                          if r.get("judgement_C2") else ""),
+                f"- C3 revenue CAGR 3y {_m(r['revenue_cagr_3y_pct'])}%: {r['src_revenue_history']}",
+                f"- C4 founders and management {_m(r['insider_pct'])}%: {r['src_insider']}",
+                f"- C5 revenue outside Spain {_m(r['intl_revenue_pct'])}%: {r['src_intl']}",
+                f"- C6 {r['judgement_C6']} ({r['src_judgement_C6']})",
+                f"- C7 opinion {r['audit_opinion']}, going concern {r['going_concern']}: {r['src_opinion']}",
                 ""]
     return out
 
@@ -105,7 +105,7 @@ def write(out_dir, stages, screened, checks, cfg, figure_checks=(), ocr=False, n
         if r in stages["excluded_subsector"]:
             stage = "excluded: SOCIMI"
         elif r in stages["outside_band"]:
-            stage = "excluded: outside F1 band"
+            stage = "excluded: outside C1 band"
         elif any(x["isin"] == isin for x in stages["excluded_isin"]):
             stage = "excluded: " + next(x["reason"] for x in stages["excluded_isin"] if x["isin"] == isin)
         else:

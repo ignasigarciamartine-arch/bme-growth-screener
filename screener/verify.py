@@ -147,11 +147,20 @@ def kind(f):
 
 
 def check_extracted(isin, entry, cache, ocr_exe=None):
-    return [{"isin": isin, "metric": f["metric"], "year": f.get("year"), "value": f["value"],
+    rows = [{"isin": isin, "metric": f["metric"], "year": f.get("year"), "value": f["value"],
              "scale": f.get("scale", 1), "file": f["file"], "page": f["page"],
              "method": f["method"], "check_kind": kind(f),
              "check": check_figure(f, cache, ocr_exe), "note": f.get("note")}
             for f in (entry or {}).get("figures", [])]
+    # A judgement is reasoning for a human to read: the check is that the page
+    # it cites exists.
+    for j in (entry or {}).get("judgements", []):
+        ok = _pdf_path(cache, j["file"]) and _page_text(cache, j["file"], j["page"]) is not None
+        rows.append({"isin": isin, "metric": "judgement_" + j["filter"], "year": None,
+                     "value": j["verdict"], "scale": None, "file": j["file"], "page": j["page"],
+                     "method": j["method"], "check_kind": DOCUMENTED,
+                     "check": "CITED" if ok else "NO_FILE", "note": j["text"]})
+    return rows
 
 
 def verify(row, lh, filing, ex=None, entry=None, cache=None, ocr_exe=None):

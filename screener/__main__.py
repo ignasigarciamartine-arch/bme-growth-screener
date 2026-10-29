@@ -1,6 +1,11 @@
-"""python -m screener run [--as-of YYYY-MM-DD] [--offline] [--rebuild-snapshot] [--no-ocr]
+"""python -m screener run  [--as-of YYYY-MM-DD] [--offline] [--rebuild-snapshot] [--no-ocr]
+python -m screener todo [--as-of YYYY-MM-DD] [--offline]
 
-harvest -> parse -> screen -> verify -> report
+harvest -> parse -> screen -> verify -> report, and the agents' work queue.
+
+`run` is the tool the agents call (see AGENTS.md): it applies C1-C7 to the
+figures in data/extracted/<as_of>/ and writes runs/<as_of>/todo.csv, the next
+filter to read or judge for every company still open. `todo` prints it.
 
 The universe and the list of documents for a date are a versioned snapshot in
 data/snapshots/<as_of>/. A run uses that snapshot when it exists and downloads
@@ -43,6 +48,28 @@ def harvest(cfg, as_of, cache, offline, rebuild, log):
         rel = os.path.relpath(snap, ROOT)
         log(f"[harvest] versioned snapshot {rel} ({len(uni)} companies, "
             f"{'cache only' if offline else 'downloading what the cache lacks'})")
+        # The criteria can bring in candidates the snapshot holds no documents
+        # for: list theirs now and extend the snapshot, logged.
+        cands = screen.funnel(uni, cfg)["candidates"]
+        new = [c for c in cands if c["isin"] not in docs]
+        if new and offline:
+            log(f"[harvest] {len(new)} candidates without documents in the snapshot; "
+                "--offline: their filters stay NEEDS_DATA")
+        elif new:
+            log(f"[harvest] documents for {len(new)} candidates new to the snapshot: "
+                + ", ".join(c["name"] for c in new))
+            filings = sources.harvest_filings(new, as_of, log=log)
+            holdings = sources.harvest_holdings(new, as_of, log=log)
+            sheets = sources.harvest_lighthouse(new, as_of, log=log)
+            for c in new:
+                docs[c["isin"]] = {"name": c["name"], "filing": filings[c["isin"]][0],
+                                   "filing_prior": filings[c["isin"]][1],
+                                   "holdings": holdings[c["isin"]],
+                                   "lighthouse": sheets[c["isin"]]}
+            with open(os.path.join(snap, "documents.json"), "w", encoding="utf-8") as f:
+                json.dump(docs, f, ensure_ascii=False, indent=1)
+        keep = {c["isin"] for c in cands}
+        docs = {k: v for k, v in docs.items() if k in keep}
     else:
         log(f"[harvest] rebuilding the snapshot: universe of {cfg['universe']['segment']} on {as_of}")
         uni = universe.build(as_of, cfg["universe"]["segment"], log=log)
@@ -107,8 +134,11 @@ def run(args, log=print):
         f"(data/extracted/{as_of.isoformat()})")
     figs = {isin: extracted.figures(e) for isin, e in ex.items()}
 
-    log("[screen] funnel and filters F1-F7")
+    log("[screen] funnel and filters C1-C7")
     stages = screen.funnel(uni, cfg)
+    empty = {"filing": {}, "lighthouse": {}}
+    for c in stages["candidates"]:
+        parsed.setdefault(c["isin"], empty)
     screened = [screen.evaluate(c, parsed[c["isin"]]["lighthouse"], parsed[c["isin"]]["filing"], cfg,
                                 figs.get(c["isin"]))
                 for c in stages["candidates"]]
@@ -143,6 +173,13 @@ def run(args, log=print):
                          docs=docs, extracted=ex, parsed=parsed)
     with open(os.path.join(out, "parsed.json"), "w", encoding="utf-8") as f:
         json.dump(parsed, f, ensure_ascii=False, indent=1)
+    queue = screen.todo(screened, {k for k, d in docs.items() if d["filing"].get("status") == "OK"},
+                        {k: set(e["open"]) for k, e in ex.items()})
+    with open(os.path.join(out, "todo.csv"), "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=["isin", "name", "filter", "agent", "task", "open"])
+        w.writeheader()
+        w.writerows(queue)
+    log(f"[todo] {len(queue)} companies with a filter still to read or judge (todo.csv)")
     log("[report] " + out + " (report.html, screened.csv, funnel.md)")
     log("")
     log("\n".join(lines))
@@ -153,6 +190,28 @@ def main(argv=None):
     p = argparse.ArgumentParser(prog="screener")
     sub = p.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="harvest -> parse -> screen -> verify -> report")
+    t = sub.add_parser("todo", help="run, then print the agents' work queue")
+    for x in (r, t):
+        _common(x)
+    a = p.parse_args(argv)
+    if a.offline and a.rebuild_snapshot:
+        p.error("--offline and --rebuild-snapshot exclude each other")
+    env.check()
+    if a.cmd == "run":
+        run(a)
+    elif a.cmd == "todo":
+        run(a, log=lambda *x: None)
+        with open(os.path.join(a.out, a.as_of or "", "todo.csv"), encoding="utf-8") as f:
+            queue = list(csv.DictReader(f))
+        with open(os.path.join(a.out, a.as_of or "", "screened.csv"), encoding="utf-8") as f:
+            screened = list(csv.DictReader(f))
+        for q in queue:
+            print(f"{q['filter']}  {q['agent']:<12} {q['name']:<28} {q['task']}")
+        print(f"{len(queue)} companies to read or judge; "
+              f"{sum(r['verdict'] == 'PASS' for r in screened)} PASS so far")
+
+
+def _common(r):
     r.add_argument("--as-of", help="universe date (default: config)")
     r.add_argument("--offline", action="store_true",
                    help="no network: the versioned snapshot and the cache only")
@@ -163,12 +222,6 @@ def main(argv=None):
     r.add_argument("--config", default=os.path.join(ROOT, "config", "criteria.toml"))
     r.add_argument("--cache", default=os.path.join(ROOT, "cache"))
     r.add_argument("--out", default=os.path.join(ROOT, "runs"))
-    a = p.parse_args(argv)
-    if a.offline and a.rebuild_snapshot:
-        p.error("--offline and --rebuild-snapshot exclude each other")
-    env.check()
-    if a.cmd == "run":
-        run(a)
 
 
 if __name__ == "__main__":

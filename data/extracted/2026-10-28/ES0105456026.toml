@@ -1,0 +1,10 @@
+isin = "ES0105456026"
+name = "HOLALUZ-CLIDOM"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Described as greentech, but the business is selling energy, market representation and installing solar systems. Revenue comes from energy and installations; software is a tool."
+file = "hlz_20260902_1.pdf"
+page = 3
+method = "agent-read"

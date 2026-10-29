@@ -3,7 +3,7 @@ name = "LLEIDANETWORKS SERVICES"
 # FY2025 pack 05089_OtraInfRelev_20260408.pdf is a PDF portfolio: the consolidated accounts are the nested
 # attachment __att2__att3 (80 pages) and the audit report __att2__att2 (PKF Attest). The text parse only saw the
 # 7-page cover. FY2023 consolidated accounts: 05089_OtraInfRelev_20240429.pdf, scanned, read through OCR.
-# Revenue fell 20% in 2023 and has not recovered the 2022 level: F4 fails (CAGR 2022-2025 -2.2%).
+# Revenue fell 20% in 2023 and has not recovered the 2022 level: C3 fails (CAGR 2022-2025 -2.2%).
 
 [[figure]]
 metric = "revenue"
@@ -44,56 +44,6 @@ file = "05089_OtraInfRelev_20240429.pdf"
 page = 30
 method = "ocr"
 note = "Consolidated P&L FY2023, 2022 comparative (scanned)"
-
-[[figure]]
-metric = "ebit"
-year = 2025
-value = 1635327.79
-scale = 1
-file = "05089_OtraInfRelev_20260408__att2__att3.pdf"
-page = 6
-method = "pdftotext"
-note = "Resultado de explotacion"
-
-[[figure]]
-metric = "da"
-year = 2025
-value = 2111667.38
-scale = 1
-file = "05089_OtraInfRelev_20260408__att2__att3.pdf"
-page = 6
-method = "pdftotext"
-note = "Amortizacion del inmovilizado"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 3155918.77
-scale = 1
-file = "05089_OtraInfRelev_20260408__att2__att3.pdf"
-page = 5
-method = "pdftotext"
-note = "Deudas a largo plazo"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 3820330.55
-scale = 1
-file = "05089_OtraInfRelev_20260408__att2__att3.pdf"
-page = 5
-method = "pdftotext"
-note = "Deudas a corto plazo"
-
-[[figure]]
-metric = "cash"
-year = 2025
-value = 1178364.5
-scale = 1
-file = "05089_OtraInfRelev_20260408__att2__att3.pdf"
-page = 4
-method = "pdftotext"
-note = "Efectivo y otros activos liquidos equivalentes"
 
 [[figure]]
 metric = "audit_opinion"

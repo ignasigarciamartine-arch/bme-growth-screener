@@ -1,0 +1,10 @@
+isin = "ES0105638003"
+name = "LABIANA HEALTH"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Pharmaceutical group that develops, makes and sells medicines for animal and human health. Manufacturing pharma, not a scalable technology product."
+file = "05638_OtraInfRelev_20260421_2.pdf"
+page = 13
+method = "agent-read"

@@ -1,0 +1,58 @@
+isin = "ES0112320009"
+name = "CATENON"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "12320_OtraInfRelev_20260406.pdf"
+page = 3
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "12320_OtraInfRelev_20260406.pdf"
+page = 4
+method = "ocr"
+note = "Forvis Mazars; key audit matters on p4, no going-concern section"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 14035900
+scale = 1
+file = "12320_OtraInfRelev_20260406.pdf"
+page = 10
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 11712078
+scale = 1
+file = "12320_OtraInfRelev_20260406.pdf"
+page = 10
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 11539449
+scale = 1
+file = "12320_OtraInfRelev_20240405_1.pdf"
+page = 9
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 10770143
+scale = 1
+file = "12320_OtraInfRelev_20240405_1.pdf"
+page = 9
+method = "ocr"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"

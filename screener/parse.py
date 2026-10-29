@@ -8,7 +8,7 @@ Audited accounts (text layer, read with PDFium):
   number read from the text is never final on its own.
 
 Lighthouse sheets (pdfplumber):
-  The first-page table: revenue, recurring EBITDA, net debt, free float. Only
+  The first-page table: revenue and free float. Only
   the actual year ('A') is used; analyst estimates ('e') never feed a filter.
 """
 import os
@@ -43,10 +43,6 @@ AUDITORS = [
 # Labels as they appear under the Spanish GAAP (PGC)
 LINES = {
     "revenue": r"importe\s+neto\s+de\s+la\s+cifra\s+de\s+negocio",
-    "ebit": r"resultado\s+de\s+explotacion",
-    "da": r"amortizacion\s+del\s+inmovilizado",
-    "debt": r"deudas\s+con\s+entidades\s+de\s+credito",
-    "cash": r"efectivo\s+y\s+otros\s+activos\s+liquidos",
 }
 NUM = re.compile(r"\(?-?\d{1,3}(?:\.\d{3})+(?:,\d+)?\)?|\(?-?\d+,\d+\)?")
 
@@ -218,8 +214,6 @@ def parse_lighthouse(pdf):
     years = [y + ("e" if e else "A") for y, e in re.findall(r"(\d{4})(e?)", m.group(1))] if m else []
     rows = {
         "revenue": _row(t, r"Total\s+Ingresos"),
-        "ebitda": _row(t, r"EBITDA\s*(?:\(Recurrente\)|Rec\.?|Recurrente|ajustado)?\s*\d?(?=\s)"),
-        "net_debt": _row(t, r"Deuda\s+(?:Financiera\s+)?Neta|\bDFN\b"),
         "free_float": _row(t, r"Free\s*Float", ratio_ok=True),
     }
 
@@ -227,6 +221,5 @@ def parse_lighthouse(pdf):
         return rows[k]["vals"][0] if rows[k] else None
     return {"file": os.path.basename(pdf), "years": years,
             "actual_year": years[0] if years else None,
-            "revenue_m": first("revenue"), "ebitda_m": first("ebitda"),
-            "net_debt_m": first("net_debt"), "free_float_pct": first("free_float"),
+            "revenue_m": first("revenue"), "free_float_pct": first("free_float"),
             "rows": rows}

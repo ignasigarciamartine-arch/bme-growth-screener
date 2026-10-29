@@ -1,8 +1,7 @@
 isin = "ES0105909008"
 name = "TREE TECHNOLOGY"
 # Individual accounts FY2025, 05909_OtraInfRelev_20260429.pdf (KPMG). Listed Jan-2026: no FY2023 accounts in
-# BME, so F4 stays open; F5 already fails. Net debt at 3.54x EBITDA is driven by 'otros pasivos financieros' (1.82M),
-# which the company itself counts in its own net financial debt (results presentation, same pack).
+# BME, so C3 stays open; C5 fails (98.5% of revenue in Spain).
 
 [[figure]]
 metric = "revenue"
@@ -25,56 +24,6 @@ method = "agent-read"
 note = "P&L, 2024 comparative"
 
 [[figure]]
-metric = "ebit"
-year = 2025
-value = 500_567
-scale = 1
-file = "05909_OtraInfRelev_20260429.pdf"
-page = 25
-method = "agent-read"
-note = "Resultado de explotacion"
-
-[[figure]]
-metric = "da"
-year = 2025
-value = 147_995
-scale = 1
-file = "05909_OtraInfRelev_20260429.pdf"
-page = 25
-method = "agent-read"
-note = "Amortizacion del inmovilizado; EBIT + D&A = 648,562, the EBITDA the company reports"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 1_586_982
-scale = 1
-file = "05909_OtraInfRelev_20260429.pdf"
-page = 24
-method = "pdftotext"
-note = "Deudas a largo plazo (bank 500,000 + other 1,086,982)"
-
-[[figure]]
-metric = "gross_debt"
-year = 2025
-value = 2_192_132
-scale = 1
-file = "05909_OtraInfRelev_20260429.pdf"
-page = 24
-method = "pdftotext"
-note = "Deudas a corto plazo (bank 1,456,567 + other 735,565)"
-
-[[figure]]
-metric = "cash"
-year = 2025
-value = 1_480_132
-scale = 1
-file = "05909_OtraInfRelev_20260429.pdf"
-page = 45
-method = "pdftotext"
-note = "Note 12, cash at 31-Dec-2025 (the balance-sheet line on p23 is misaligned in the text layer)"
-
-[[figure]]
 metric = "audit_opinion"
 value = "CLEAN"
 scale = 1
@@ -91,3 +40,44 @@ file = "05909_OtraInfRelev_20260429.pdf"
 page = 18
 method = "pdftotext"
 note = "Opinion -> Fundamento -> Aspectos mas relevantes; no material-uncertainty section"
+
+[open.C3]
+text = "The snapshot has no accounts before FY2024, so the 2022 revenue a three-year CAGR needs is not in hand. Revenue grew 1.5% in 2025."
+refs = ["05909_OtraInfRelev_20260429.pdf#25"]
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 14.43
+scale = "pct"
+file = "05909_OtraInfRelev_20260701.pdf"
+page = 1
+method = "pdftotext"
+note = "BIOSENSE, S.L., 99.8% owned by director Javier Rivela Rodriguez"
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 18.47
+scale = "pct"
+file = "05909_OtraInfRelev_20260701.pdf"
+page = 1
+method = "pdftotext"
+note = "GIRASOLES FINANCE, S.L., 100% owned by director Manuel Antonio Rivela Rodriguez"
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 14.43
+scale = "pct"
+file = "05909_OtraInfRelev_20260701.pdf"
+page = 1
+method = "pdftotext"
+note = "MAD ADQUISICIONES, S.L.U., owned by director Manu Argadi Inversiones (Manuel Arganza Diaz)"
+
+[[figure]]
+metric = "domestic_revenue"
+year = 2025
+value = 7130498
+scale = 1
+file = "05909_OtraInfRelev_20260429.pdf"
+page = 55
+method = "pdftotext"
+note = "Revenue by geography: Nacional 7,130,498 of 7,239,987 (98.5% Spain, management report p59)"

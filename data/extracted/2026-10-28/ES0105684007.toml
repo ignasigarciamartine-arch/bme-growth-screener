@@ -1,0 +1,10 @@
+isin = "ES0105684007"
+name = "IFLEX FLEXIBLE"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Flexible-packaging maker aiming to be a reference in the Spanish packaging market. Industrial manufacturing."
+file = "05684_OtraInfRelev_20260430.pdf"
+page = 10
+method = "agent-read"

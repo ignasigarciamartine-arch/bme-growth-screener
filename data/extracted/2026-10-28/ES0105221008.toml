@@ -1,0 +1,10 @@
+isin = "ES0105221008"
+name = "PANGAEA ONCOLOGY"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Oncology medical services, predictive-diagnosis lab services and drug development. A science-based services business; no technology product that scales on its own is described."
+file = "05221_OtraInfRelev_20260430.pdf"
+page = 28
+method = "agent-read"

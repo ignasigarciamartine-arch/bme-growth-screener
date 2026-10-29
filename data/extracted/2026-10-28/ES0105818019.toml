@@ -1,0 +1,84 @@
+isin = "ES0105818019"
+name = "OPTARE SOLUTIONS"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 9
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 10
+method = "ocr"
+note = "Key audit matters on p10 (revenue by stage of completion), no going-concern section"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 9976877.94
+scale = 1
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 17
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 10311769.36
+scale = 1
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 17
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[open.C3]
+text = "Listed in 2025: the snapshot has no accounts before FY2024, so the 2022 revenue a three-year CAGR needs is not in hand. Revenue fell 3.3% in 2025."
+refs = ["05818_OtraInfRelev_20260430_1.pdf#17"]
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 11.42
+scale = "pct"
+file = "05818_OtraInfRelev_20260701.pdf"
+page = 1
+method = "pdftotext"
+note = "Luis Alfonso Alvarez Sestelo, founding partner, chairman and CEO (accounts p118)"
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 5.65
+scale = "pct"
+file = "05818_OtraInfRelev_20260701.pdf"
+page = 1
+method = "pdftotext"
+note = "Santiago Delgado Arce, founding partner, board secretary (accounts p118)"
+
+[open.C4]
+text = "Two board members, both founding partners, hold 17.07%. Six more holders own about 11.3% each; the documents do not say whether they are founders or managers, so the stake is not added."
+refs = ["05818_OtraInfRelev_20260701.pdf#1", "05818_OtraInfRelev_20260430_1.pdf#118"]
+
+
+[[figure]]
+metric = "intl_revenue_pct"
+year = 2025
+value = 30
+scale = "pct"
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 60
+method = "pdftotext"
+note = "Management report: Mexico alone reached almost 30% of revenue in 2025 (no full geographic split published)"
+
+
+[[judgement]]
+filter = "C6"
+verdict = "FAIL"
+text = "The management report says 2025 missed the growth forecasts set for the period but does not publish them; no quantified, dated target is given."
+file = "05818_OtraInfRelev_20260430_1.pdf"
+page = 60
+method = "agent-read"

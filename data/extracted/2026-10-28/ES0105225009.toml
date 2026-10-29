@@ -1,7 +1,7 @@
 isin = "ES0105225009"
 name = "ROBOT"
 # FY2025 pack 05225_OtraInfRelev_20260413.pdf is scanned end to end (no text layer): read through OCR.
-# Only the opinion is entered: it decides the case (F7 FAIL). The text parse had read this report as CLEAN.
+# Only the opinion is entered: it decides the case (C7 FAIL). The text parse had read this report as CLEAN.
 
 [[figure]]
 metric = "audit_opinion"

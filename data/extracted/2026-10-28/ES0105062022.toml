@@ -1,0 +1,10 @@
+isin = "ES0105062022"
+name = "NBI BEARINGS EUROPE"
+
+[[judgement]]
+filter = "C2"
+verdict = "FAIL"
+text = "Designs and makes bearings and other industrial parts for industry, automotive and aerospace. An industrial manufacturer: technology is not the product."
+file = "05062_OtraInfRelev_20260330.pdf"
+page = 54
+method = "agent-read"

@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Screening Results</title>
+<meta name="description" content="Where the 109 companies on BME Growth fell out of the screen, and why Cuatroochenta is the only one that passes all seven filters.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#ffffff;--canvas:#f5f9fd;--node-2:#eef4fb;--line:#c4d4e6;
+  --ink:#111418;--ink-2:#2b2f36;--ink-3:#4a5160;
+  --agent:#487FCB;--tool:#02418c;--sky:#8CCCF1;
+  --pass:#2f9e4f;--pass-ink:#1f7a3a;--pass-wash:#dcf3e2;
+  --fail:#d9534f;--fail-ink:#b3302c;--fail-wash:#fbe0df;
+  --need:#d99a12;--need-wash:#fdf0d5;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  --sans:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+code{font-family:var(--mono);font-size:.88em}
+.wrap{max-width:84rem;margin:0 auto;padding:0 1rem}
+@media (min-width:48rem){.wrap{padding:0 2rem}}
+.top{position:relative;padding-top:2.2rem;padding-bottom:1.4rem}
+@media (min-width:48rem){.top{padding-top:3rem;padding-bottom:1.6rem}}
+@media (min-width:40rem) and (max-width:72rem){.top{padding-top:5.5rem}}
+.me{position:absolute;top:1.4rem;right:1.4rem;display:flex;align-items:center;gap:1rem;font:700 1.35rem var(--sans);color:var(--ink)}
+.me a{display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;color:#fff;background:#0a66c2;border-radius:999px;padding:.6rem 1.2rem;font-size:1.05rem}
+.me a svg{width:1.2rem;height:1.2rem}
+@media (max-width:40rem){.me{position:static;margin-bottom:1.2rem;font-size:1.15rem;flex-wrap:wrap;gap:.6rem}}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .9rem;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.dots{display:inline-grid;grid-template-columns:repeat(2,.5rem);gap:.15rem;margin-right:.3rem}.dots i{width:.5rem;height:.5rem;border-radius:50%;background:var(--sky)}.dots i:nth-child(n+3){background:var(--tool)}
+.eyebrow .live{display:inline-flex;align-items:center;gap:.4rem;color:var(--tool)}
+.eyebrow .live::before{content:"";width:.45rem;height:.45rem;border-radius:50%;background:var(--tool)}
+h1{font-size:clamp(1.9rem,4.6vw,3.2rem);line-height:1.08;letter-spacing:-.015em;margin:0 0 .9rem;font-weight:700;color:var(--tool);max-width:22ch;text-wrap:balance}
+h1 em{font-style:normal;color:var(--pass)}
+.lede{color:var(--ink-2);max-width:64ch;margin:0 0 1.4rem;font-size:1.02rem}
+.actions{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.55rem;font:600 .92rem var(--sans);padding:.7rem 1.1rem;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
+.btn.main{background:var(--agent);border-color:var(--agent);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem;padding-bottom:1.4rem}
+@media (min-width:48rem){.kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.kpi{background:var(--canvas);border:1px solid var(--line);border-radius:.6rem;padding:.75rem .9rem}
+.kpi .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{color:var(--tool);font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:1.6rem;line-height:1.2}
+.kpi.pass{background:var(--pass-wash);border-color:var(--pass)}.kpi.pass .v{color:var(--pass-ink)}
+.kpi.need{background:var(--need-wash);border-color:var(--need)}.kpi.need .v{color:#a86f00}
+.kpi.fail{background:var(--fail-wash);border-color:var(--fail)}.kpi.fail .v{color:var(--fail-ink)}
+
+h2{font-size:1.45rem;letter-spacing:-.01em;margin:0 0 .4rem;color:var(--tool)}
+h3{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);font-weight:400;margin:0 0 .9rem}
+.sec{padding:2.2rem 0 0}
+.sub{color:var(--ink-2);max-width:70ch;margin:0 0 1.1rem}
+
+.board{background:var(--canvas);border:1px solid var(--line);border-radius:.8rem;overflow:hidden}
+.bar{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .9rem;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.72rem;color:var(--ink-3);white-space:nowrap}
+@media (max-width:30rem){.bar .count{display:none}}
+.scroll{overflow-x:auto}
+.hint{display:block;font-family:var(--mono);font-size:.68rem;color:var(--ink-3);padding:.5rem .9rem 0}
+@media (min-width:64rem){.hint{display:none}}
+svg.sankey{display:block;width:100%;min-width:940px;height:auto;padding:.4rem .4rem 0}
+svg.sankey .lk{opacity:.38;transition:opacity .15s}
+svg.sankey .lk:hover{opacity:.62}
+svg.sankey .nv{font:700 20px var(--mono);fill:var(--tool)}
+svg.sankey .nv.sm{font-size:15px}
+svg.sankey .nv.out{fill:#4a5f7a}
+svg.sankey .nv.pass{fill:var(--pass-ink)}
+svg.sankey .nv.fail{fill:var(--fail-ink)}
+svg.sankey .ns{font:500 12.5px var(--sans);fill:var(--ink-2)}
+.note{border-top:1px solid var(--line);padding:.8rem .9rem;font-size:.84rem;color:var(--ink-2)}
+.note code{color:var(--ink)}
+
+.groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(15.5rem,1fr));gap:.6rem;align-items:start}
+.g{background:var(--canvas);border:1px solid var(--line);border-left:4px solid var(--fail);border-radius:.6rem;padding:.8rem .9rem}
+.g b{font-family:var(--mono);color:var(--fail-ink);font-size:.78rem;margin-right:.4rem}
+.g .l{font-weight:600}
+.g .n{float:right;font:700 1.15rem var(--mono);color:var(--fail-ink)}
+.g ul{list-style:none;margin:.5rem 0 0;padding:0;font-size:.84rem;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:.25rem .35rem}
+.g li{background:#fff;border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem}
+.g li span{font-family:var(--mono);font-size:.78rem;color:var(--fail-ink)}
+
+.co{display:grid;gap:1rem;grid-template-columns:minmax(0,1fr)}
+@media (min-width:64rem){.co{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}}
+.card{background:var(--canvas);border:1px solid var(--line);border-radius:.8rem;padding:1rem 1.1rem}
+.card.pass{background:var(--pass-wash);border-color:var(--pass)}
+.badge{display:inline-block;font:700 .66rem var(--mono);letter-spacing:.13em;text-transform:uppercase;color:#fff;background:var(--pass);border-radius:999px;padding:.2rem .6rem;margin-bottom:.6rem}
+.card p{margin:0 0 .7rem;color:var(--ink-2)}
+.card p:last-child{margin-bottom:0}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem;margin:.8rem 0 0}
+.fact{background:#fff;border:1px solid rgba(47,158,79,.45);border-radius:.55rem;padding:.6rem .7rem}
+.fact .k{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.fact .v{font:700 1.3rem var(--mono);color:var(--pass-ink);line-height:1.25}
+.fact .d{font-size:.78rem;color:var(--ink-2)}
+svg.rev{display:block;width:100%;height:auto}
+svg.rev .b{fill:var(--agent)}
+svg.rev .b.last{fill:var(--tool)}
+svg.rev .t{font:600 12px var(--mono);fill:var(--ink)}
+svg.rev .y{font:500 11.5px var(--mono);fill:var(--ink-3)}
+svg.rev .g2030{fill:none;stroke:var(--pass);stroke-width:2;stroke-dasharray:5 4}
+svg.rev .t2030{font:700 12px var(--mono);fill:var(--pass-ink)}
+.cap{font-size:.78rem;color:var(--ink-3);margin:.4rem 0 0}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:.8rem;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:52rem;font-size:.86rem}
+th{font:600 .64rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:.65rem .8rem;background:var(--canvas);border-bottom:1px solid var(--line)}
+td{padding:.7rem .8rem;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+tr:last-child td{border-bottom:0}
+td.f{white-space:nowrap}
+td.f b{font-family:var(--mono);color:var(--tool);margin-right:.35rem}
+td.f span{color:var(--ink);font-weight:600}
+td.v{color:var(--ink)}
+td.v strong{font-family:var(--mono);color:var(--pass-ink)}
+td.s a{color:var(--tool);text-decoration-color:rgba(2,65,140,.35)}
+td.s small{display:block;color:var(--ink-3);font-size:.76rem}
+.ok{display:inline-block;font:700 .62rem var(--mono);letter-spacing:.08em;color:var(--pass-ink);background:var(--pass-wash);border:1px solid rgba(47,158,79,.45);border-radius:999px;padding:.08rem .45rem;white-space:nowrap}
+.caveat{border:1px solid var(--line);border-left:3px solid var(--need);border-radius:.4rem;padding:.9rem 1.1rem;background:var(--canvas);max-width:62rem;margin-top:1rem}
+.caveat p{margin:0;color:var(--ink-2)}
+.caveat b{color:var(--ink)}
+footer{padding:2.6rem 0 3rem;color:var(--ink-3);font-size:.8rem}
+footer a{color:var(--tool)}
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <div class="me"><span>Ignasi Garcia Martin</span><a href="https://www.linkedin.com/in/ignasi-garcia"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.1c.5-1 1.8-2 3.8-2 4 0 4.8 2.6 4.8 6V21h-4v-5.6c0-1.3 0-3-1.9-3s-2.2 1.5-2.2 2.9V21H9z"/></svg>LinkedIn</a></div>
+  <p class="eyebrow"><span class="dots"><i></i><i></i><i></i><i></i></span><span>Prepared for 4Founders Capital</span><span>·</span><span>bme-growth-screener</span><span>·</span><span class="live">results · run of 28 Oct 2026</span></p>
+  <h1>109 companies in, <em>one</em> comes out</h1>
+  <p class="lede">Where every company on BME Growth fell out of the screen, and why Cuatroochenta is the only one that clears all seven filters. Each figure below links to the PDF page it was read from.</p>
+  <div class="actions">
+    <a class="btn" href="index.html">← The workflow</a>
+    <a class="btn main" href="../examples/report-2026-10-28.html">Full report, company by company →</a>
+  </div>
+</header>
+
+<section class="wrap kpis" aria-label="Result">
+  <div class="kpi"><div class="k">Listed</div><div class="v">109</div></div>
+  <div class="kpi"><div class="k">Candidates</div><div class="v">34</div></div>
+  <div class="kpi pass"><div class="k">Pass</div><div class="v">1</div></div>
+  <div class="kpi need"><div class="k">Needs data</div><div class="v">0</div></div>
+  <div class="kpi fail"><div class="k">Fail</div><div class="v">33</div></div>
+</section>
+
+<section class="wrap">
+  <div class="board">
+    <div class="bar"><span>Funnel · universe as of 28 Oct 2026</span><span class="count">1 company = 3.3 px</span></div>
+    <span class="hint">← swipe to see the whole funnel →</span>
+    <div class="scroll">
+<svg class="sankey" viewBox="0 0 1220 516" role="img" aria-label="Screening funnel: 109 listed, 55 operating, 35 in the band, 34 candidates, 1 pass, 33 fail">
+<path class="lk" d="M44.0,70.0 C132.0,70.0 132.0,70.0 220.0,70.0 L220.0,251.5 C132.0,251.5 132.0,251.5 44.0,251.5 Z" fill="#487FCB"><title>listed → oper: 55</title></path>
+<path class="lk" d="M44.0,251.5 C132.0,251.5 132.0,297.5 220.0,297.5 L220.0,475.7 C132.0,475.7 132.0,429.7 44.0,429.7 Z" fill="#9fb6d0"><title>listed → socimi: 54</title></path>
+<path class="lk" d="M234.0,70.0 C322.0,70.0 322.0,70.0 410.0,70.0 L410.0,185.5 C322.0,185.5 322.0,185.5 234.0,185.5 Z" fill="#487FCB"><title>oper → inband: 35</title></path>
+<path class="lk" d="M234.0,185.5 C322.0,185.5 322.0,225.5 410.0,225.5 L410.0,291.5 C322.0,291.5 322.0,251.5 234.0,251.5 Z" fill="#9fb6d0"><title>oper → bandout: 20</title></path>
+<path class="lk" d="M424.0,70.0 C512.0,70.0 512.0,70.0 600.0,70.0 L600.0,182.2 C512.0,182.2 512.0,182.2 424.0,182.2 Z" fill="#487FCB"><title>inband → cand: 34</title></path>
+<path class="lk" d="M424.0,182.2 C512.0,182.2 512.0,432.2 600.0,432.2 L600.0,435.5 C512.0,435.5 512.0,185.5 424.0,185.5 Z" fill="#9fb6d0"><title>inband → byname: 1</title></path>
+<path class="lk" d="M614.0,70.0 C702.0,70.0 702.0,70.0 790.0,70.0 L790.0,73.3 C702.0,73.3 702.0,73.3 614.0,73.3 Z" fill="#2f9e4f"><title>cand → pass: 1</title></path>
+<path class="lk" d="M614.0,73.3 C702.0,73.3 702.0,119.3 790.0,119.3 L790.0,228.2 C702.0,228.2 702.0,182.2 614.0,182.2 Z" fill="#d9534f"><title>cand → fail: 33</title></path>
+<path class="lk" d="M804.0,119.3 C882.0,119.3 882.0,89.3 960.0,89.3 L960.0,155.3 C882.0,155.3 882.0,185.3 804.0,185.3 Z" fill="#d9534f"><title>fail → C2: 20</title></path>
+<path class="lk" d="M804.0,185.3 C882.0,185.3 882.0,171.3 960.0,171.3 L960.0,187.8 C882.0,187.8 882.0,201.8 804.0,201.8 Z" fill="#d9534f"><title>fail → C3: 5</title></path>
+<path class="lk" d="M804.0,201.8 C882.0,201.8 882.0,203.8 960.0,203.8 L960.0,220.3 C882.0,220.3 882.0,218.3 804.0,218.3 Z" fill="#d9534f"><title>fail → C7: 5</title></path>
+<path class="lk" d="M804.0,218.3 C882.0,218.3 882.0,236.3 960.0,236.3 L960.0,242.9 C882.0,242.9 882.0,224.9 804.0,224.9 Z" fill="#d9534f"><title>fail → C6: 2</title></path>
+<path class="lk" d="M804.0,224.9 C882.0,224.9 882.0,258.9 960.0,258.9 L960.0,262.2 C882.0,262.2 882.0,228.2 804.0,228.2 Z" fill="#d9534f"><title>fail → C5: 1</title></path>
+<rect class="nd" x="30" y="70.0" width="14" height="359.7" rx="2" fill="#487FCB"/>
+<rect class="nd" x="220" y="70.0" width="14" height="181.5" rx="2" fill="#487FCB"/>
+<rect class="nd" x="220" y="297.5" width="14" height="178.2" rx="2" fill="#9fb6d0"/>
+<rect class="nd" x="410" y="70.0" width="14" height="115.5" rx="2" fill="#487FCB"/>
+<rect class="nd" x="410" y="225.5" width="14" height="66.0" rx="2" fill="#9fb6d0"/>
+<rect class="nd" x="600" y="70.0" width="14" height="112.2" rx="2" fill="#487FCB"/>
+<rect class="nd" x="600" y="432.2" width="14" height="3.3" rx="2" fill="#9fb6d0"/>
+<rect class="nd" x="790" y="70.0" width="14" height="3.3" rx="2" fill="#2f9e4f"/>
+<rect class="nd" x="790" y="119.3" width="14" height="108.9" rx="2" fill="#d9534f"/>
+<rect class="nd" x="960" y="89.3" width="14" height="66.0" rx="2" fill="#d9534f"/>
+<rect class="nd" x="960" y="171.3" width="14" height="16.5" rx="2" fill="#d9534f"/>
+<rect class="nd" x="960" y="203.8" width="14" height="16.5" rx="2" fill="#d9534f"/>
+<rect class="nd" x="960" y="236.3" width="14" height="6.6" rx="2" fill="#d9534f"/>
+<rect class="nd" x="960" y="258.9" width="14" height="3.3" rx="2" fill="#d9534f"/>
+<text class="nv" x="30" y="46.0">109</text><text class="ns" x="30" y="62.0">listed on BME Growth</text>
+<text class="nv" x="220" y="46.0">55</text><text class="ns" x="220" y="62.0">operating companies</text>
+<text class="nv sm out" x="242" y="391.6">54</text><text class="ns" x="266.4" y="391.6">SOCIMIs (property vehicles)</text>
+<text class="nv" x="410" y="46.0">35</text><text class="ns" x="410" y="62.0">market cap EUR 5–80M</text>
+<text class="nv sm out" x="432" y="263.5">20</text><text class="ns" x="456.4" y="263.5">outside the C1 band</text>
+<text class="nv" x="600" y="46.0">34</text><text class="ns" x="600" y="62.0">candidates screened</text>
+<text class="nv sm out" x="622" y="438.8">1</text><text class="ns" x="637.2" y="438.8">property vehicle (Domo Activos)</text>
+<text class="nv sm pass" x="812" y="76.7">1 PASS</text><text class="ns" x="873.2" y="76.7">Cuatroochenta</text>
+<text class="nv fail" x="790" y="254.2">33 FAIL</text><text class="ns" x="790" y="270.2">split by the first</text><text class="ns" x="790" y="285.2">filter they fail</text>
+<text class="nv sm fail" x="982" y="127.3">20</text><text class="ns" x="1006.4" y="127.3">C2 · not a tech company</text>
+<text class="nv sm fail" x="982" y="184.6">5</text><text class="ns" x="997.2" y="184.6">C3 · grows < 20% a year</text>
+<text class="nv sm fail" x="982" y="217.1">5</text><text class="ns" x="997.2" y="217.1">C7 · accounts not clean</text>
+<text class="nv sm fail" x="982" y="244.6">2</text><text class="ns" x="997.2" y="244.6">C6 · no published plan</text>
+<text class="nv sm fail" x="982" y="265.6">1</text><text class="ns" x="997.2" y="265.6">C5 · < 25% outside Spain</text>
+</svg>
+    </div>
+    <div class="note">Every failing company is counted once, at the first filter it fails. Seven fail two: six on C2 and C7, one on C2 and C3. Counts come from <code>runs/2026-10-28/universe_stages.csv</code> and <code>screened.csv</code>, written by <code>python -m screener run --as-of 2026-10-28</code>.</div>
+  </div>
+</section>
+
+<section class="wrap sec">
+  <h3>The 33 that fail, by first filter</h3>
+  <div class="groups">
+    <div class="g"><span class="n">20</span><b>C2</b><span class="l">Not a tech company</span>
+      <ul><li>Andino Inversiones</li><li>Biotechnology Assets</li><li>Elzinc</li><li>Endurance Motive</li><li>Energía Innovación</li><li>Energy Solar Tech</li><li>Enerside Energy</li><li>Greening Group</li><li>Griñó Ecologic</li><li>Hannun</li><li>Holaluz-Clidom</li><li>iFlex Flexible</li><li>Kompuestos</li><li>Labiana Health</li><li>Llorente y Cuenca</li><li>NBI Bearings Europe</li><li>NZI Helmets</li><li>Pangaea Oncology</li><li>Solarprofit</li><li>Umbrella Global</li></ul></div>
+    <div class="g"><span class="n">5</span><b>C3</b><span class="l">Revenue grows less than 20% a year</span>
+      <ul><li>Making Science <span>18.3%</span></li><li>Seresco <span>18.3%</span></li><li>Catenon <span>9.2%</span></li><li>Gigas Hosting <span>6.6%</span></li><li>Lleida.net <span>−2.2%</span></li></ul></div>
+    <div class="g"><span class="n">5</span><b>C7</b><span class="l">Qualified opinion or going-concern doubt</span>
+      <ul><li>1nkemia IUCT</li><li>Facephi</li><li>Parlem Telecom</li><li>Redegal</li><li>Robot</li></ul></div>
+    <div class="g"><span class="n">2</span><b>C6</b><span class="l">No published plan with dated targets</span>
+      <ul><li>Optare Solutions</li><li>Substrate Artificial</li></ul></div>
+    <div class="g"><span class="n">1</span><b>C5</b><span class="l">Less than 25% of revenue outside Spain</span>
+      <ul><li>Tree Technology <span>1.5%</span></li></ul></div>
+  </div>
+</section>
+
+<section class="wrap sec">
+  <h3>The one that passes</h3>
+  <h2>Cuatroochenta</h2>
+  <p class="sub">An international technology holding of cloud software and cybersecurity companies, present in Spain and Latin America (FY2025 accounts, p.32). ISIN ES0105509006, fiscal year 2025.</p>
+  <div class="co">
+    <div class="card pass">
+      <span class="badge">Pass · 7 of 7</span>
+      <p>The only candidate that meets all seven at once: a tech company in the ticket band, growing above 20% a year, with the two CEOs holding 29.3%, 44% of sales abroad, a dated plan in public and clean accounts.</p>
+      <div class="facts">
+        <div class="fact"><div class="k">Market cap</div><div class="v">€48.9M</div><div class="d">inside the €5–80M ticket band</div></div>
+        <div class="fact"><div class="k">Revenue CAGR 2022–25</div><div class="v">25.5%</div><div class="d">€18.5M → €36.5M</div></div>
+        <div class="fact"><div class="k">The two CEOs own</div><div class="v">29.3%</div><div class="d">16.07% + 13.26%</div></div>
+        <div class="fact"><div class="k">Revenue outside Spain</div><div class="v">44%</div><div class="d">“more than 44%”</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:.4rem">Revenue, EUR M, and the 2030 target</h3>
+      <svg class="rev" viewBox="0 0 520 250" role="img" aria-label="Revenue 2022 18.5, 2023 22.4, 2024 27.6, 2025 36.5 million euros; Guidance 2030 70 million euros">
+        <line x1="20" y1="214" x2="500" y2="214" stroke="#c4d4e6"/>
+        <rect class="b" x="40" y="161.2" width="62" height="52.8" rx="3"/><text class="t" x="71" y="153" text-anchor="middle">18.5</text><text class="y" x="71" y="232" text-anchor="middle">2022</text>
+        <rect class="b" x="122" y="150.0" width="62" height="64.0" rx="3"/><text class="t" x="153" y="142" text-anchor="middle">22.4</text><text class="y" x="153" y="232" text-anchor="middle">2023</text>
+        <rect class="b" x="204" y="135.2" width="62" height="78.8" rx="3"/><text class="t" x="235" y="127" text-anchor="middle">27.6</text><text class="y" x="235" y="232" text-anchor="middle">2024</text>
+        <rect class="b last" x="286" y="109.6" width="62" height="104.4" rx="3"/><text class="t" x="317" y="101" text-anchor="middle">36.5</text><text class="y" x="317" y="232" text-anchor="middle">2025</text>
+        <rect class="g2030" x="400" y="14" width="62" height="200" rx="3"/><text class="t2030" x="431" y="36" text-anchor="middle">70</text><text class="y" x="431" y="232" text-anchor="middle">2030</text>
+        <text class="y" x="431" y="54" text-anchor="middle">target</text>
+      </svg>
+      <p class="cap">2022–23: FY2023 accounts, p.19. 2024–25: FY2025 accounts, p.47 (consolidated P&amp;L, net revenue). 2030: Guidance 2030, FY2025 accounts, p.9, organic only.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.6rem">Filter by filter, with the page behind each figure</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Filter</th><th>Bar</th><th>Cuatroochenta</th><th>Source</th><th>Verifier</th></tr></thead>
+      <tbody>
+        <tr><td class="f"><b>C1</b><span>Ticket fit</span></td><td>Market cap €5–80M</td><td class="v"><strong>€48.9M</strong>: 2,732,362 shares × €17.90, BME close of 27 Oct 2026</td><td class="s">BME public API<small><code>data/snapshots/2026-10-28/universe.csv</code></small></td><td><span class="ok">CODE</span></td></tr>
+        <tr><td class="f"><b>C2</b><span>Tech component</span></td><td>BME sector 06, or tech is the product</td><td class="v"><strong>Sector 06</strong> (technology and telecommunications): cloud software and cybersecurity</td><td class="s">BME public API<small><code>universe.csv</code>; activity: <a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/04/05509_OtraInfRelev_20260429.pdf#page=32">FY2025 accounts, p.32</a></small></td><td><span class="ok">CODE</span></td></tr>
+        <tr><td class="f"><b>C3</b><span>Scale</span></td><td>Revenue CAGR 3 years ≥ 20%</td><td class="v"><strong>25.5%</strong>: €18,480,541 (2022) → €22,406,369 → €27,582,911 → €36,543,950 (2025)</td><td class="s"><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2024/04/05509_OtraInfRelev_20240415.pdf#page=19">FY2023 accounts, p.19</a> (2022, 2023)<small><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/04/05509_OtraInfRelev_20260429.pdf#page=47">FY2025 accounts, p.47</a> (2024, 2025)</small></td><td><span class="ok">FOUND ×4</span></td></tr>
+        <tr><td class="f"><b>C4</b><span>Ownership</span></td><td>Founders and management ≥ 20%</td><td class="v"><strong>29.3%</strong>: the two CEOs (consejeros delegados), Sergio Aguado 16.07% and Alfredo Raúl Cebrián 13.26%. The chairman’s family office (15.33%) is left out to stay conservative.</td><td class="s"><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/07/05509_OtraInfRelev_20260708.pdf#page=1">Significant holdings at 30 Jun 2026, p.1</a><small>roles: FY2025 accounts, p.127</small></td><td><span class="ok">FOUND ×2</span></td></tr>
+        <tr><td class="f"><b>C5</b><span>International</span></td><td>≥ 25% of revenue outside Spain</td><td class="v"><strong>44%</strong>: “more than 44%” of revenue generated outside the domestic market</td><td class="s"><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/04/05509_OtraInfRelev_20260429.pdf#page=32">FY2025 accounts, p.32</a><small>management report</small></td><td><span class="ok">FOUND</span></td></tr>
+        <tr><td class="f"><b>C6</b><span>Ambition</span></td><td>Published plan with quantified, dated targets</td><td class="v"><strong>Guidance 2030</strong>, approved by the board on 22 Oct 2025: €70M revenue (2.5× 2024, +17% CAGR) and €10M EBITDA (~14% margin) by 2030, organic only; acquisitions come on top</td><td class="s"><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/04/05509_OtraInfRelev_20260429.pdf#page=9">FY2025 accounts, p.9</a><small>agent judgement</small></td><td><span class="ok">CITED</span></td></tr>
+        <tr><td class="f"><b>C7</b><span>Clean accounts</span></td><td>Clean opinion, no going-concern doubt</td><td class="v"><strong>Clean</strong>: Grant Thornton, unmodified opinion; key audit matters with no going-concern section</td><td class="s"><a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2026/04/05509_OtraInfRelev_20260429.pdf#page=128">FY2025 accounts, p.128</a><small>p.129, scanned pages read by OCR</small></td><td><span class="ok">OCR FOUND ×2</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="caveat"><p><b>Worth knowing before a first call.</b> Part of the growth comes from companies it acquired and integrated (<a href="https://apiweb.bolsasymercados.es/Market/MTFDocuments/OtraInfRelevante/2024/04/05509_OtraInfRelev_20240415.pdf#page=9">FY2023 accounts, p.9</a>). The filters do not separate organic from acquired revenue; the 2030 guidance does, and counts organic growth only.</p></div>
+</section>
+
+<footer class="wrap">Readings in <code>data/extracted/2026-10-28/ES0105509006.toml</code>, re-checked on their pages by the verifier (<code>runs/2026-10-28/extracted_check.csv</code>). Public data only: BME Growth filings. A screen, not investment advice. Ignasi Garcia Martin · <a href="https://github.com/ignasigarciamartine-arch/bme-growth-screener">code on GitHub</a>.</footer>
+
+</body>
+</html>

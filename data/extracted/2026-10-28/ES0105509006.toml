@@ -1,0 +1,99 @@
+isin = "ES0105509006"
+name = "CUATROOCHENTA"
+
+[[figure]]
+metric = "audit_opinion"
+value = "CLEAN"
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 128
+method = "ocr"
+note = "Opinion paragraph: imagen fiel, unmodified"
+
+[[figure]]
+metric = "going_concern"
+value = false
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 129
+method = "ocr"
+note = "Grant Thornton; key audit matters on p129, no going-concern section"
+
+[[figure]]
+metric = "revenue"
+year = 2025
+value = 36543950
+scale = 1
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 47
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2024
+value = 27582911
+scale = 1
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 47
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2023
+value = 22406369
+scale = 1
+file = "05509_OtraInfRelev_20240415.pdf"
+page = 19
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[figure]]
+metric = "revenue"
+year = 2022
+value = 18480541
+scale = 1
+file = "05509_OtraInfRelev_20240415.pdf"
+page = 19
+method = "pdftotext"
+note = "Consolidated P&L, Importe neto de la cifra de negocios"
+
+[[caveat]]
+text = "Part of the growth comes from companies it acquired and integrated."
+refs = ["05509_OtraInfRelev_20240415.pdf#9"]
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 16.07
+scale = "pct"
+file = "05509_OtraInfRelev_20260708.pdf"
+page = 1
+method = "pdftotext"
+note = "Sergio Aguado Gonzalez, co-CEO (consejero delegado, accounts p127)"
+
+[[figure]]
+metric = "insider_holding_pct"
+value = 13.26
+scale = "pct"
+file = "05509_OtraInfRelev_20260708.pdf"
+page = 1
+method = "pdftotext"
+note = "Alfredo Raul Cebrian Fuertes, co-CEO (consejero delegado, accounts p127). The chairman's family office (15.33%) is left out to stay conservative"
+
+[[figure]]
+metric = "intl_revenue_pct"
+year = 2025
+value = 44
+scale = "pct"
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 32
+method = "pdftotext"
+note = "Management report: more than 44% of revenue generated outside the domestic market (Spain and Latin America presence)"
+
+
+[[judgement]]
+filter = "C6"
+verdict = "PASS"
+text = "Guidance 2030, approved by the board on 22 Oct 2025 and published with the accounts: EUR 70M revenue (2.5x 2024, +17% CAGR) and EUR 10M EBITDA (~14% margin) by 2030, organic only; acquisitions come on top."
+file = "05509_OtraInfRelev_20260429.pdf"
+page = 9
+method = "agent-read"
