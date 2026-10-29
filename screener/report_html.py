@@ -176,11 +176,9 @@ SRC_RE = re.compile(r"(?P<file>\S+?\.pdf) p\.(?P<page>\S+) \((?P<kind>auto|docum
 
 
 def _src_refs(src, docs):
-    """'file p.N (auto: method) + ...' (screened.csv) -> links with their tag."""
-    out = []
-    for m in SRC_RE.finditer(src or ""):
-        out.append(f'{docs.link(m["file"], m["page"])}{_tag(m["method"])}')
-    return out
+    """'file p.N (auto: method) + ...' (screened.csv) -> links with their tag, one per page."""
+    return list(dict.fromkeys(f'{docs.link(m["file"], m["page"])}{_tag(m["method"])}'
+                              for m in SRC_RE.finditer(src or "")))
 
 
 # --------------------------------------------------------- per company
