@@ -116,10 +116,26 @@ def going_concern(sc):
                           (sc or "").lower()))
 
 
+def auditor_firm(text):
+    """The firm named most often in the document (ties: the one named first),
+    not the first firm of the list named anywhere. The filing also cites
+    other firms as advisers, previous auditors or in directors' CVs: Alquiber
+    FY2025 names Deloitte twice (risk matrix, p109 and p114) and its auditor,
+    BDO, eight times (p3 and the report's back page)."""
+    up = (text or "").upper()
+    hits = sorted((m.start(), lab) for pat, lab in AUDITORS for m in re.finditer(pat, up))
+    if not hits:
+        return None
+    count, first = {}, {}
+    for pos, lab in hits:
+        count[lab] = count.get(lab, 0) + 1
+        first.setdefault(lab, pos)
+    return min(count, key=lambda lab: (-count[lab], first[lab]))
+
+
 def audit_signals(text):
     """The opinion is classified only inside the audit report: 'salvedades'
     also appears in boilerplate elsewhere in the notes."""
-    firm = next((lab for pat, lab in AUDITORS if re.search(pat, text.upper())), None)
     m = re.search(r"INFORME\s+DE\s+AUDITORIA", text, re.I)
     if m:
         sc = text[m.start():m.start() + 30000].lower()
@@ -127,6 +143,7 @@ def audit_signals(text):
         # The report's first page is sometimes an image, so the heading is
         # missing from the text. The report opens the document: read its start.
         sc = "\f".join(text.split("\f")[:12]).lower()
+    firm = auditor_firm(text)
     op = opinion(sc)
     # The finding itself ("una incertidumbre material que PUEDE generar dudas",
     # singular) also counts wherever it is disclosed: under NIA-ES 570 the
